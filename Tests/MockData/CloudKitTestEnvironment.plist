@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>Environment</key>
+	<string>Test</string>
+	<key>CloudKitContainer</key>
+	<string>iCloud.com.screentimerewards.app.test</string>
+	<key>DatabaseScope</key>
+	<string>Private</string>
+	<key>UseMockData</key>
+	<true/>
+	<key>MockRecords</key>
+	<array>
+		<dict>
+			<key>RecordType</key>
+			<string>User</string>
+			<key>Records</key>
+			<array>
+				<dict>
+					<key>recordID</key>
+					<string>user-001</string>
+					<key>fields</key>
+					<dict>
+						<key>name</key>
+						<string>John Parent</string>
+						<key>email</key>
+						<string>john.parent@example.com</string>
+						<key>role</key>
+						<string>parent</string>
+						<key>familyID</key>
+						<string>family-001</string>
+					</dict>
+				</dict>
+				<dict>
+					<key>recordID</key>
+					<string>user-002</string>
+					<key>fields</key>
+					<dict>
+						<key>name</key>
+						<string>Jane Child</string>
+						<key>email</key>
+						<string>jane.child@example.com</string>
+						<key>role</key>
+						<string>child</string>
+						<key>familyID</key>
+						<string>family-001</string>
+						<key>points</key>
+						<integer>150</integer>
+					</dict>
+				</dict>
+			</array>
+		</dict>
+		<dict>
+			<key>RecordType</key>
+			<string>AppCategory</string>
+			<key>Records</key>
+			<array>
+				<dict>
+					<key>recordID</key>
+					<string>category-001</string>
+					<key>fields</key>
+					<dict>
+						<key>name</key>
+						<string>Educational</string>
+						<key>pointsPerHour</key>
+						<integer>20</integer>
+					</dict>
+				</dict>
+				<dict>
+					<key>recordID</key>
+					<string>category-002</string>
+					<key>fields</key>
+					<dict>
+						<key>name</key>
+						<string>Entertainment</string>
+						<key>pointsPerHour</key>
+						<integer>5</integer>
+					</dict>
+				</dict>
+			</array>
+		</dict>
+	</array>
+</dict>
+</plist>

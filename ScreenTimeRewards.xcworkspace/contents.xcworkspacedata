@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Workspace
+   version = "1.0">
+   <Group
+      location = "container:"
+      name = "Apps">
+      <FileRef
+         location = "group:Apps/ScreenTimeApp/ScreenTimeApp.xcodeproj">
+      </FileRef>
+   </Group>
+   <Group
+      location = "container:"
+      name = "Packages">
+      <FileRef
+         location = "group:Packages/SharedModels">
+      </FileRef>
+      <FileRef
+         location = "group:Packages/FamilyControlsKit">
+      </FileRef>
+      <FileRef
+         location = "group:Packages/CloudKitService">
+      </FileRef>
+      <FileRef
+         location = "group:Packages/DesignSystem">
+      </FileRef>
+      <FileRef
+         location = "group:Packages/SubscriptionService">
+      </FileRef>
+   </Group>
+   <Group
+      location = "container:"
+      name = "Tools">
+      <FileRef
+         location = "group:Tools/Scripts">
+      </FileRef>
+      <FileRef
+         location = "group:Tools/CloudKitFunctions">
+      </FileRef>
+   </Group>
+   <Group
+      location = "container:"
+      name = "Documentation">
+      <FileRef
+         location = "group:Documentation">
+      </FileRef>
+   </Group>
+   <Group
+      location = "container:"
+      name = "Configuration">
+      <FileRef
+         location = "group:Configuration">
+      </FileRef>
+   </Group>
+</Workspace>

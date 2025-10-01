@@ -1,0 +1,10 @@
+Screen Time Rewards - Version 1.0.19
+
+This release includes:
+- Automated CI/CD pipeline setup
+- Enhanced testing infrastructure
+- Code quality improvements
+- TestFlight deployment configuration
+
+Build number: 1758931342
+Built on: Fri Sep 26 19:02:22 CDT 2025

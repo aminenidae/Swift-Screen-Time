@@ -1,0 +1,40 @@
+# Test Coverage Configuration
+
+coverage:
+  # Minimum coverage percentage required for passing builds
+  minimum_coverage: 70
+  
+  # Per-target coverage requirements
+  targets:
+    - name: SharedModels
+      minimum_coverage: 80
+    - name: DesignSystem
+      minimum_coverage: 75
+    - name: RewardCore
+      minimum_coverage: 70
+    - name: CloudKitService
+      minimum_coverage: 65
+    - name: FamilyControlsKit
+      minimum_coverage: 60
+
+  # Excluded files from coverage
+  excluded_files:
+    - "*Mock*"
+    - "*Test*"
+    - "main.swift"
+    - "AppDelegate.swift"
+    - "SceneDelegate.swift"
+
+  # Reporting format
+  report_formats:
+    - html
+    - json
+    - cobertura
+
+  # Coverage thresholds
+  thresholds:
+    # Fail build if coverage drops below this percentage
+    failure_threshold: 50
+    
+    # Warning threshold for coverage
+    warning_threshold: 60

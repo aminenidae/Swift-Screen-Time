@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>Environment</key>
+	<string>Production</string>
+	<key>CloudKitContainer</key>
+	<string>iCloud.com.screentimerewards.app</string>
+	<key>LogLevel</key>
+	<string>Error</string>
+	<key>FeatureFlags</key>
+	<dict>
+		<key>DebugMode</key>
+		<false/>
+		<key>MockData</key>
+		<false/>
+	</dict>
+</dict>
+</plist>
