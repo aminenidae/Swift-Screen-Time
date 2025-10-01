@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>BackgroundTasks</key>
+	<array>
+		<dict>
+			<key>TaskID</key>
+			<string>com.screentimerewards.points-reconciliation</string>
+			<key>TaskType</key>
+			<string>Processing</string>
+			<key>TestingSchedule</key>
+			<dict>
+				<key>Interval</key>
+				<integer>300</integer>
+				<key>InitialDelay</key>
+				<integer>60</integer>
+			</dict>
+			<key>MockData</key>
+			<dict>
+				<key>UsersToProcess</key>
+				<integer>3</integer>
+				<key>AverageProcessingTime</key>
+				<integer>10</integer>
+				<key>ExpectedPointsAwarded</key>
+				<integer>150</integer>
+			</dict>
+		</dict>
+		<dict>
+			<key>TaskID</key>
+			<string>com.screentimerewards.analytics-sync</string>
+			<key>TaskType</key>
+			<string>AppRefresh</string>
+			<key>TestingSchedule</key>
+			<dict>
+				<key>Interval</key>
+				<integer>900</integer>
+				<key>InitialDelay</key>
+				<integer>120</integer>
+			</dict>
+			<key>MockData</key>
+			<dict>
+				<key>AppsToSync</key>
+				<integer>15</integer>
+				<key>AverageSyncTime</key>
+				<integer>5</integer>
+			</dict>
+		</dict>
+	</array>
+	<key>TestMode</key>
+	<string>Accelerated</string>
+	<key>UseMockBackgroundTasks</key>
+	<true/>
+</dict>
+</plist>

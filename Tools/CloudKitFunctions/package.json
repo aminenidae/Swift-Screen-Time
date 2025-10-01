@@ -1,0 +1,20 @@
+{
+  "name": "screentimerewards-cloudkit-functions",
+  "version": "1.0.0",
+  "description": "CloudKit Functions for ScreenTimeRewards subscription validation",
+  "main": "validateSubscriptionReceipt.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "cloudkit": "^1.0.0"
+  },
+  "keywords": [
+    "cloudkit",
+    "subscription",
+    "receipt-validation",
+    "storekit"
+  ],
+  "author": "ScreenTimeRewards Team",
+  "license": "ISC"
+}

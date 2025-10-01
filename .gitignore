@@ -1,0 +1,61 @@
+# Xcode
+*.xccheckout
+*.xcscmblueprint
+*.xcscheme
+*.xcodeproj/xcuserdata/
+*.xcodeproj/project.xcworkspace/xcuserdata/
+*.xcworkspace/xcuserdata/
+build/
+Build/
+DerivedData/
+ModuleCache/
+*.moved-aside
+*.pbxuser
+*.mode1v3
+*.mode2v3
+*.perspectivev3
+**/*~.nib
+*.swp
+*.tmp
+.DS_Store
+*.plist.lock
+<<<<<<< HEAD
+*.plist.lockfile
+=======
+>>>>>>> 8f0ab4aada3435c83eb711f05a28e74b0aec5977
+
+# Swift Package Manager
+Packages/
+.build/
+.swiftpm/
+<<<<<<< HEAD
+*.pcm
+*.swiftinterface
+*.swiftmodule
+index/
+=======
+>>>>>>> 8f0ab4aada3435c83eb711f05a28e74b0aec5977
+
+# Xcode compilation cache
+CompilationCache.noindex/
+ModuleCache.noindex/
+SDKStatCaches.noindex/
+
+# OS generated files
+Thumbs.db
+<<<<<<< HEAD
+
+# User-specific files
+*.xcuserstate
+project.xcworkspace/
+xcuserdata/
+UserInterfaceState.xcuserstate
+
+# Build artifacts
+*.dSYM
+*.o
+*.a
+*.dylib
+*.so
+=======
+>>>>>>> 8f0ab4aada3435c83eb711f05a28e74b0aec5977

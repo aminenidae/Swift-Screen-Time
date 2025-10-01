@@ -1,0 +1,94 @@
+{
+  "version": "1.0",
+  "mockData": {
+    "users": [
+      {
+        "id": "user-001",
+        "name": "John Parent",
+        "email": "john.parent@example.com",
+        "familyId": "family-001",
+        "role": "parent",
+        "subscription": {
+          "type": "screentime.2child.monthly",
+          "status": "active",
+          "startDate": "2025-01-01T00:00:00Z",
+          "endDate": "2025-02-01T00:00:00Z"
+        }
+      },
+      {
+        "id": "user-002",
+        "name": "Jane Child",
+        "email": "jane.child@example.com",
+        "familyId": "family-001",
+        "role": "child",
+        "points": 150
+      },
+      {
+        "id": "user-003",
+        "name": "Jimmy Child",
+        "email": "jimmy.child@example.com",
+        "familyId": "family-001",
+        "role": "child",
+        "points": 75
+      }
+    ],
+    "apps": [
+      {
+        "bundleId": "com.apple.Maps",
+        "name": "Maps",
+        "category": "Navigation"
+      },
+      {
+        "bundleId": "com.apple.MobileSMS",
+        "name": "Messages",
+        "category": "Social"
+      },
+      {
+        "bundleId": "com.apple.mobilesafari",
+        "name": "Safari",
+        "category": "Web Browser"
+      },
+      {
+        "bundleId": "com.toyopagroup.picaboo",
+        "name": "Snapchat",
+        "category": "Social"
+      },
+      {
+        "bundleId": "com.facebook.Facebook",
+        "name": "Facebook",
+        "category": "Social"
+      }
+    ],
+    "categories": [
+      {
+        "id": "category-001",
+        "name": "Educational",
+        "pointsPerHour": 20
+      },
+      {
+        "id": "category-002",
+        "name": "Entertainment",
+        "pointsPerHour": 5
+      },
+      {
+        "id": "category-003",
+        "name": "Social",
+        "pointsPerHour": 2
+      }
+    ],
+    "rewards": [
+      {
+        "id": "reward-001",
+        "name": "Extra 30 minutes of screen time",
+        "cost": 100,
+        "type": "timeExtension"
+      },
+      {
+        "id": "reward-002",
+        "name": "$5 Amazon Gift Card",
+        "cost": 500,
+        "type": "giftCard"
+      }
+    ]
+  }
+}
