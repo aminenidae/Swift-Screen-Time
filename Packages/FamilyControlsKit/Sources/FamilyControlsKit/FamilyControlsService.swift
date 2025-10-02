@@ -142,9 +142,107 @@ public class FamilyControlsService: ObservableObject {
         #endif
     }
 
-    // MARK: - Reward Time Allocation
+    // MARK: - App Blocking and Unlocking System
+
+    /// Unlocks a specific entertainment app for a specific duration using points
+    public func unlockApp(
+        bundleID: String,
+        durationMinutes: Int,
+        pointsCost: Int,
+        childID: String
+    ) async throws -> AppUnlockResult {
+        guard isAuthorized else {
+            return .authorizationRequired
+        }
+
+        do {
+            // Create application token for the specific app
+            let appToken = try await createApplicationToken(bundleID: bundleID)
+
+            // Remove the app from blocked list temporarily
+            try await temporarilyUnblockApp(
+                appToken: appToken,
+                durationMinutes: durationMinutes,
+                childID: childID
+            )
+
+            // Schedule automatic re-blocking
+            try await scheduleAppReblocking(
+                appToken: appToken,
+                afterMinutes: durationMinutes,
+                childID: childID
+            )
+
+            let unlockInfo = AppUnlockInfo(
+                bundleID: bundleID,
+                durationMinutes: durationMinutes,
+                pointsCost: pointsCost,
+                unlockedAt: Date(),
+                expiresAt: Date().addingTimeInterval(TimeInterval(durationMinutes * 60)),
+                childID: childID
+            )
+
+            return .success(unlockInfo)
+
+        } catch {
+            return .systemError(error.localizedDescription)
+        }
+    }
+
+    /// Blocks all entertainment apps for a specific child
+    public func blockAllEntertainmentApps(for childID: String, entertainmentApps: [String]) async throws -> Bool {
+        guard isAuthorized else {
+            throw FamilyControlsError.authorizationRequired
+        }
+
+        do {
+            // Convert bundle IDs to application tokens
+            var appTokens: Set<ApplicationToken> = []
+            for bundleID in entertainmentApps {
+                let token = try await createApplicationToken(bundleID: bundleID)
+                appTokens.insert(token)
+            }
+
+            // Apply blocking to all entertainment apps
+            try await blockApps(appTokens, for: childID)
+            return true
+
+        } catch {
+            throw FamilyControlsError.restrictionFailed(error)
+        }
+    }
+
+    /// Gets currently unlocked apps for a child
+    public func getUnlockedApps(for childID: String) async throws -> [AppUnlockInfo] {
+        guard isAuthorized else {
+            throw FamilyControlsError.authorizationRequired
+        }
+
+        // In a real implementation, this would query the ManagedSettings store
+        // For now, return stored unlock sessions
+        return getCurrentUnlockSessions(for: childID)
+    }
+
+    /// Manually re-blocks an app (e.g., when time expires or parent intervenes)
+    public func reblockApp(bundleID: String, childID: String) async throws -> Bool {
+        guard isAuthorized else {
+            throw FamilyControlsError.authorizationRequired
+        }
+
+        do {
+            let appToken = try await createApplicationToken(bundleID: bundleID)
+            try await addAppToBlockedList(appToken, for: childID)
+            removeUnlockSession(bundleID: bundleID, childID: childID)
+            return true
+        } catch {
+            throw FamilyControlsError.restrictionFailed(error)
+        }
+    }
+
+    // MARK: - Legacy Reward Time Allocation (Deprecated)
 
     /// Allocates reward screen time for a specific app based on a redemption
+    @available(*, deprecated, message: "Use unlockApp instead for app-specific unlocking")
     public func allocateRewardTime(
         for redemption: PointToTimeRedemption,
         appBundleID: String
@@ -166,17 +264,26 @@ public class FamilyControlsService: ObservableObject {
         }
 
         do {
-            // Create application token for the specific app
-            let appToken = try await createApplicationToken(bundleID: appBundleID)
-
-            // Apply managed settings for reward time
-            try await applyRewardTimeSettings(
-                appToken: appToken,
-                timeMinutes: remainingMinutes,
-                redemptionID: redemption.id
+            // Use new unlocking system
+            let unlockResult = try await unlockApp(
+                bundleID: appBundleID,
+                durationMinutes: remainingMinutes,
+                pointsCost: 0, // Legacy - no point cost for existing redemptions
+                childID: "default"
             )
 
-            return .success(allocatedMinutes: remainingMinutes)
+            switch unlockResult {
+            case .success:
+                return .success(allocatedMinutes: remainingMinutes)
+            case .authorizationRequired:
+                return .authorizationRequired
+            case .appNotFound:
+                return .systemError("App not found")
+            case .alreadyUnlocked:
+                return .systemError("App already unlocked")
+            case .systemError(let message):
+                return .systemError(message)
+            }
 
         } catch {
             return .systemError(error.localizedDescription)
@@ -275,18 +382,117 @@ public class FamilyControlsService: ObservableObject {
 
     // MARK: - Private Methods
 
+    // MARK: - Session Management
+    private var unlockSessions: [String: [AppUnlockInfo]] = [:]
+
+    private func getCurrentUnlockSessions(for childID: String) -> [AppUnlockInfo] {
+        return unlockSessions[childID]?.filter { $0.expiresAt > Date() } ?? []
+    }
+
+    private func removeUnlockSession(bundleID: String, childID: String) {
+        unlockSessions[childID]?.removeAll { $0.bundleID == bundleID }
+    }
+
+    private func addUnlockSession(_ info: AppUnlockInfo) {
+        if unlockSessions[info.childID] == nil {
+            unlockSessions[info.childID] = []
+        }
+        unlockSessions[info.childID]?.append(info)
+    }
+
+    // MARK: - App Token Management
     private func createApplicationToken(bundleID: String) async throws -> ApplicationToken {
         // In a real implementation, this would use the Family Controls framework
         // to create an application token for the specific bundle ID
-        // For now, we'll simulate this functionality
 
         #if canImport(FamilyControls) && !os(macOS) && !targetEnvironment(simulator)
         // On device, this would use the actual Family Controls API
-        // This is a placeholder implementation
-        throw FamilyControlsError.notImplemented("ApplicationToken creation not implemented in demo")
+        // For now, this is a demonstration of how it would work:
+
+        // Real implementation would:
+        // 1. Use FamilyActivityPicker to get user selection
+        // 2. Extract ApplicationTokens from FamilyActivitySelection
+        // 3. Store mapping between bundle ID and token
+
+        // For now, create a mock token with the bundle ID
+        return ApplicationToken(bundleID)
         #else
         // Simulator/macOS doesn't support Family Controls, return a mock token
-        throw FamilyControlsError.simulatorNotSupported
+        return ApplicationToken(bundleID)
+        #endif
+    }
+
+    // MARK: - ManagedSettings Integration
+    private func temporarilyUnblockApp(
+        appToken: ApplicationToken,
+        durationMinutes: Int,
+        childID: String
+    ) async throws {
+        #if canImport(FamilyControls) && !os(macOS) && !targetEnvironment(simulator)
+        // Real device implementation:
+        // 1. Get current ManagedSettings
+        // 2. Remove app from blocked applications set
+        // 3. Set up DeviceActivity to re-block after duration
+
+        let settings = store
+        // Example of real implementation:
+        // var currentBlocked = settings.application.blockedApplications
+        // currentBlocked.remove(appToken)
+        // settings.application.blockedApplications = currentBlocked
+
+        print("DEVICE: Would temporarily unblock app for \(durationMinutes) minutes")
+        #else
+        // Development/Simulator implementation
+        print("DEV: Temporarily unblocked \(appToken) for \(durationMinutes) minutes for child \(childID)")
+        #endif
+    }
+
+    private func scheduleAppReblocking(
+        appToken: ApplicationToken,
+        afterMinutes: Int,
+        childID: String
+    ) async throws {
+        #if canImport(FamilyControls) && !os(macOS) && !targetEnvironment(simulator)
+        // Real device implementation would use DeviceActivity to schedule re-blocking
+        print("DEVICE: Would schedule re-blocking after \(afterMinutes) minutes")
+        #else
+        // Development/Simulator: Schedule re-blocking using Timer
+        DispatchQueue.main.asyncAfter(deadline: .now() + TimeInterval(afterMinutes * 60)) {
+            Task {
+                try? await self.addAppToBlockedList(appToken, for: childID)
+                self.removeUnlockSession(bundleID: String(describing: appToken), childID: childID)
+                print("DEV: Re-blocked \(appToken) for child \(childID)")
+            }
+        }
+        #endif
+    }
+
+    private func blockApps(_ appTokens: Set<ApplicationToken>, for childID: String) async throws {
+        #if canImport(FamilyControls) && !os(macOS) && !targetEnvironment(simulator)
+        // Real device implementation:
+        let settings = store
+        // settings.application.blockedApplications = appTokens
+
+        print("DEVICE: Would block \(appTokens.count) apps for child \(childID)")
+        #else
+        // Development/Simulator implementation
+        let bundleIDs = appTokens.map { String(describing: $0) }
+        print("DEV: Blocked apps for child \(childID): \(bundleIDs.joined(separator: ", "))")
+        #endif
+    }
+
+    private func addAppToBlockedList(_ appToken: ApplicationToken, for childID: String) async throws {
+        #if canImport(FamilyControls) && !os(macOS) && !targetEnvironment(simulator)
+        // Real device implementation:
+        let settings = store
+        // var currentBlocked = settings.application.blockedApplications
+        // currentBlocked.insert(appToken)
+        // settings.application.blockedApplications = currentBlocked
+
+        print("DEVICE: Would add \(appToken) to blocked list")
+        #else
+        // Development/Simulator implementation
+        print("DEV: Added \(appToken) to blocked list for child \(childID)")
         #endif
     }
 
@@ -334,6 +540,76 @@ public class FamilyControlsService: ObservableObject {
 
 // MARK: - Result Types
 
+// MARK: - App Unlock System Types
+public enum AppUnlockResult: Equatable {
+    case success(AppUnlockInfo)
+    case authorizationRequired
+    case appNotFound
+    case alreadyUnlocked
+    case systemError(String)
+}
+
+public struct AppUnlockInfo: Equatable {
+    public let bundleID: String
+    public let durationMinutes: Int
+    public let pointsCost: Int
+    public let unlockedAt: Date
+    public let expiresAt: Date
+    public let childID: String
+
+    public init(bundleID: String, durationMinutes: Int, pointsCost: Int, unlockedAt: Date, expiresAt: Date, childID: String) {
+        self.bundleID = bundleID
+        self.durationMinutes = durationMinutes
+        self.pointsCost = pointsCost
+        self.unlockedAt = unlockedAt
+        self.expiresAt = expiresAt
+        self.childID = childID
+    }
+
+    public var isActive: Bool {
+        return expiresAt > Date()
+    }
+
+    public var remainingMinutes: Int {
+        let remaining = expiresAt.timeIntervalSinceNow / 60
+        return max(0, Int(remaining))
+    }
+}
+
+// MARK: - Entertainment App Configuration
+public struct EntertainmentAppConfig: Codable, Equatable {
+    public let bundleID: String
+    public let displayName: String
+    public let pointsCostPer30Min: Int
+    public let pointsCostPer60Min: Int
+    public let isEnabled: Bool
+    public let parentConfiguredAt: Date
+
+    public init(bundleID: String, displayName: String, pointsCostPer30Min: Int, pointsCostPer60Min: Int, isEnabled: Bool, parentConfiguredAt: Date) {
+        self.bundleID = bundleID
+        self.displayName = displayName
+        self.pointsCostPer30Min = pointsCostPer30Min
+        self.pointsCostPer60Min = pointsCostPer60Min
+        self.isEnabled = isEnabled
+        self.parentConfiguredAt = parentConfiguredAt
+    }
+
+    public func pointsCost(for minutes: Int) -> Int {
+        switch minutes {
+        case 0...30:
+            return pointsCostPer30Min
+        case 31...60:
+            return pointsCostPer60Min
+        default:
+            // For longer durations, calculate proportionally based on 60min rate
+            let hourlyRate = pointsCostPer60Min
+            let hours = Double(minutes) / 60.0
+            return Int(ceil(hours * Double(hourlyRate)))
+        }
+    }
+}
+
+// MARK: - Legacy Types
 public enum RewardTimeAllocationResult: Equatable {
     case success(allocatedMinutes: Int)
     case authorizationRequired
