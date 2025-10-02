@@ -3,6 +3,7 @@ import SharedModels
 import FamilyControls
 import ManagedSettings
 import DeviceActivity
+import Contacts
 
 @available(iOS 15.0, macOS 10.15, *)
 public class AppDiscoveryService: ObservableObject {
@@ -15,14 +16,36 @@ public class AppDiscoveryService: ObservableObject {
 
     /// Updates the current authorization status
     public func updateAuthorizationStatus() {
-        authorizationStatus = AuthorizationCenter.shared.authorizationStatus
+        DispatchQueue.main.async {
+            #if os(iOS)
+            // Convert from FamilyControls.AuthorizationStatus to FamilyControlsKit.AuthorizationStatus
+            switch AuthorizationCenter.shared.authorizationStatus {
+            case .notDetermined:
+                self.authorizationStatus = .notDetermined
+            case .denied:
+                self.authorizationStatus = .denied
+            case .approved:
+                self.authorizationStatus = .approved
+            @unknown default:
+                self.authorizationStatus = .notDetermined
+            }
+            #else
+            self.authorizationStatus = .notDetermined
+            #endif
+        }
     }
 
     /// Requests Family Controls authorization
     @available(iOS 16.0, *)
     public func requestAuthorization() async throws {
+        #if os(iOS)
         try await AuthorizationCenter.shared.requestAuthorization(for: .individual)
-        updateAuthorizationStatus()
+        await MainActor.run {
+            updateAuthorizationStatus()
+        }
+        #else
+        throw AppDiscoveryError.notAuthorized
+        #endif
     }
 
     /// Requests Family Controls authorization (iOS 15 compatibility)
@@ -32,7 +55,9 @@ public class AppDiscoveryService: ObservableObject {
         } else {
             // For iOS 15, Family Controls requires manual permission setup
             // The user needs to enable it in Settings > Screen Time > Family Controls
-            updateAuthorizationStatus()
+            await MainActor.run {
+                updateAuthorizationStatus()
+            }
             if authorizationStatus != .approved {
                 throw AppDiscoveryError.notAuthorized
             }

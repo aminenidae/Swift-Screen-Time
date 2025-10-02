@@ -628,8 +628,12 @@ struct ParentSettingsView: View {
         NavigationView {
             List {
                 Section("Family Management") {
-                    NavigationLink(destination: Text("Family Settings")) {
-                        Label("Family Settings", systemImage: "house.fill")
+                    NavigationLink(destination: FamilySetupView()) {
+                        Label("Family Setup", systemImage: "house.fill")
+                    }
+
+                    NavigationLink(destination: FamilyMembersView()) {
+                        Label("Family Members", systemImage: "person.2.fill")
                     }
 
                     NavigationLink(destination: Text("Add Child")) {
@@ -1274,6 +1278,364 @@ struct AppCategoryRow: View {
 enum AppCategory: String, CaseIterable {
     case educational = "educational"
     case entertainment = "entertainment"
+}
+
+// MARK: - Family Setup & Management
+struct FamilySetupView: View {
+    var body: some View {
+        ScrollView {
+            VStack(spacing: 24) {
+                // Header
+                VStack(spacing: 16) {
+                    Image(systemName: "house.circle.fill")
+                        .font(.system(size: 60))
+                        .foregroundColor(.blue)
+
+                    Text("Family Setup")
+                        .font(.title)
+                        .fontWeight(.bold)
+
+                    Text("Set up your family to use Screen Time Rewards")
+                        .font(.subheadline)
+                        .foregroundColor(.secondary)
+                        .multilineTextAlignment(.center)
+                }
+
+                // Setup Steps
+                VStack(alignment: .leading, spacing: 20) {
+                    Text("Setup Steps")
+                        .font(.headline)
+                        .fontWeight(.semibold)
+
+                    SetupStepCard(
+                        number: "1",
+                        title: "Enable Family Sharing",
+                        description: "Go to Settings > [Your Name] > Family Sharing and set up your family group",
+                        icon: "person.2.fill",
+                        isCompleted: false
+                    )
+
+                    SetupStepCard(
+                        number: "2",
+                        title: "Add Family Members",
+                        description: "Invite family members to join your Family Sharing group",
+                        icon: "person.badge.plus.fill",
+                        isCompleted: false
+                    )
+
+                    SetupStepCard(
+                        number: "3",
+                        title: "Set Up Screen Time",
+                        description: "Enable Screen Time for family members in Settings > Screen Time",
+                        icon: "clock.fill",
+                        isCompleted: false
+                    )
+
+                    SetupStepCard(
+                        number: "4",
+                        title: "Enable Family Controls",
+                        description: "Return to this app and enable Family Controls in Settings",
+                        icon: "shield.fill",
+                        isCompleted: false
+                    )
+                }
+
+                // Help Section
+                VStack(alignment: .leading, spacing: 12) {
+                    Text("Need Help?")
+                        .font(.headline)
+                        .fontWeight(.semibold)
+
+                    VStack(alignment: .leading, spacing: 8) {
+                        HelpRow(
+                            icon: "questionmark.circle.fill",
+                            text: "Family Sharing allows you to share apps, subscriptions, and manage Screen Time"
+                        )
+                        HelpRow(
+                            icon: "info.circle.fill",
+                            text: "Children under 13 are automatically added to Family Sharing"
+                        )
+                        HelpRow(
+                            icon: "exclamationmark.triangle.fill",
+                            text: "Both parents and children need to use this app for the reward system to work"
+                        )
+                    }
+                }
+
+                Spacer()
+            }
+            .padding()
+        }
+        .navigationTitle("Family Setup")
+        .navigationBarTitleDisplayMode(.inline)
+    }
+}
+
+struct FamilyMembersView: View {
+    @StateObject private var familyMemberService = FamilyMemberService()
+    @State private var errorMessage: String?
+
+    var body: some View {
+        VStack {
+            if familyMemberService.isLoading {
+                ProgressView("Loading family members...")
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+            } else if familyMemberService.familyMembers.isEmpty {
+                // Empty State
+                VStack(spacing: 20) {
+                    Image(systemName: "person.2.slash.fill")
+                        .font(.system(size: 60))
+                        .foregroundColor(.orange)
+
+                    Text("No Family Members Found")
+                        .font(.title2)
+                        .fontWeight(.bold)
+
+                    Text("To see family members here, you need to:")
+                        .font(.subheadline)
+                        .foregroundColor(.secondary)
+                        .multilineTextAlignment(.center)
+
+                    VStack(alignment: .leading, spacing: 8) {
+                        ChecklistItem(text: "Set up Family Sharing in iOS Settings")
+                        ChecklistItem(text: "Add family members to your group")
+                        ChecklistItem(text: "Enable Screen Time for family members")
+                        ChecklistItem(text: "Install this app on family devices")
+                    }
+
+                    NavigationLink(destination: FamilySetupView()) {
+                        Text("Family Setup Guide")
+                            .frame(maxWidth: .infinity)
+                            .padding()
+                            .background(Color.blue)
+                            .foregroundColor(.white)
+                            .cornerRadius(12)
+                    }
+                    .padding(.top)
+                }
+                .padding()
+            } else {
+                // Family Members List
+                List {
+                    ForEach(familyMemberService.familyMembers, id: \.id) { member in
+                        RealFamilyMemberRow(member: member)
+                    }
+                }
+                .refreshable {
+                    loadFamilyMembers()
+                }
+            }
+        }
+        .navigationTitle("Family Members")
+        .navigationBarTitleDisplayMode(.inline)
+        .onAppear {
+            loadFamilyMembers()
+        }
+        .alert("Error", isPresented: .constant(errorMessage != nil)) {
+            Button("OK") { errorMessage = nil }
+        } message: {
+            Text(errorMessage ?? "")
+        }
+    }
+
+    private func loadFamilyMembers() {
+        Task {
+            do {
+                let _ = try await familyMemberService.fetchFamilyMembers()
+            } catch {
+                await MainActor.run {
+                    errorMessage = error.localizedDescription
+                }
+            }
+        }
+    }
+}
+
+struct SetupStepCard: View {
+    let number: String
+    let title: String
+    let description: String
+    let icon: String
+    let isCompleted: Bool
+
+    var body: some View {
+        HStack(spacing: 16) {
+            // Step Number
+            ZStack {
+                Circle()
+                    .fill(isCompleted ? Color.green : Color.blue)
+                    .frame(width: 40, height: 40)
+
+                if isCompleted {
+                    Image(systemName: "checkmark")
+                        .foregroundColor(.white)
+                        .font(.title3)
+                } else {
+                    Text(number)
+                        .foregroundColor(.white)
+                        .font(.title3)
+                }
+            }
+
+            VStack(alignment: .leading, spacing: 4) {
+                Text(title)
+                    .font(.headline)
+                    .fontWeight(.semibold)
+
+                Text(description)
+                    .font(.subheadline)
+                    .foregroundColor(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+
+            Spacer()
+
+            Image(systemName: icon)
+                .font(.title2)
+                .foregroundColor(isCompleted ? .green : .blue)
+        }
+        .padding()
+        .background(
+            RoundedRectangle(cornerRadius: 12)
+                .fill(Color(.secondarySystemBackground))
+        )
+    }
+}
+
+struct HelpRow: View {
+    let icon: String
+    let text: String
+
+    var body: some View {
+        HStack(spacing: 12) {
+            Image(systemName: icon)
+                .foregroundColor(.blue)
+                .font(.subheadline)
+                .frame(width: 20)
+
+            Text(text)
+                .font(.subheadline)
+                .foregroundColor(.primary)
+
+            Spacer()
+        }
+    }
+}
+
+struct ChecklistItem: View {
+    let text: String
+
+    var body: some View {
+        HStack(spacing: 8) {
+            Image(systemName: "checkmark.circle.fill")
+                .foregroundColor(.green)
+                .font(.subheadline)
+
+            Text(text)
+                .font(.subheadline)
+
+            Spacer()
+        }
+    }
+}
+
+struct FamilyMemberRow: View {
+    let member: FamilyMember
+
+    var body: some View {
+        HStack {
+            Image(systemName: member.isChild ? "person.fill" : "person.2.fill")
+                .foregroundColor(member.isChild ? .blue : .green)
+                .font(.title2)
+
+            VStack(alignment: .leading) {
+                Text(member.name)
+                    .font(.headline)
+                    .fontWeight(.medium)
+
+                Text(member.isChild ? "Child" : "Parent")
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+            }
+
+            Spacer()
+
+            if member.hasAppInstalled {
+                Image(systemName: "checkmark.circle.fill")
+                    .foregroundColor(.green)
+            } else {
+                Image(systemName: "exclamationmark.circle.fill")
+                    .foregroundColor(.orange)
+            }
+        }
+        .padding(.vertical, 4)
+    }
+}
+
+struct RealFamilyMemberRow: View {
+    let member: FamilyMemberInfo
+
+    var body: some View {
+        HStack {
+            Image(systemName: member.isChild ? "person.fill" : "person.2.fill")
+                .foregroundColor(member.isChild ? .blue : .green)
+                .font(.title2)
+
+            VStack(alignment: .leading) {
+                HStack {
+                    Text(member.name)
+                        .font(.headline)
+                        .fontWeight(.medium)
+
+                    if member.isCurrentUser {
+                        Text("(You)")
+                            .font(.caption)
+                            .foregroundColor(.blue)
+                            .padding(.horizontal, 6)
+                            .padding(.vertical, 2)
+                            .background(
+                                RoundedRectangle(cornerRadius: 4)
+                                    .fill(Color.blue.opacity(0.1))
+                            )
+                    }
+                }
+
+                Text(member.isChild ? "Child" : "Parent")
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+            }
+
+            Spacer()
+
+            VStack(alignment: .trailing, spacing: 4) {
+                if member.hasAppInstalled {
+                    HStack(spacing: 4) {
+                        Image(systemName: "checkmark.circle.fill")
+                            .foregroundColor(.green)
+                        Text("App Installed")
+                            .font(.caption)
+                            .foregroundColor(.green)
+                    }
+                } else {
+                    HStack(spacing: 4) {
+                        Image(systemName: "exclamationmark.circle.fill")
+                            .foregroundColor(.orange)
+                        Text("App Needed")
+                            .font(.caption)
+                            .foregroundColor(.orange)
+                    }
+                }
+            }
+        }
+        .padding(.vertical, 4)
+    }
+}
+
+struct FamilyMember {
+    let id = UUID()
+    let name: String
+    let isChild: Bool
+    let hasAppInstalled: Bool
 }
 
 private let itemFormatter: DateFormatter = {

@@ -1363,6 +1363,7 @@ public struct ParentActivity: Codable, Identifiable, Equatable {
 
 // MARK: - ParentActivity Extensions
 
+@available(iOS 13.0, macOS 10.15, *)
 public extension ParentActivity {
     var relativeTimestamp: String {
         let formatter = RelativeDateTimeFormatter()

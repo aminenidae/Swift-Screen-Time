@@ -1,0 +1,1 @@
+/Users/ameen/Library/Mobile Documents/com~apple~CloudDocs/App Dev/BMad-Install/.claude/commands/BMad/agents/bmad-master.md
