@@ -9,7 +9,7 @@ typealias AppSubscriptionStatus = SharedModels.SubscriptionStatus
 @available(iOS 15.0, *)
 struct SubscriptionStatusIndicator: View {
     @StateObject private var subscriptionService = SubscriptionService()
-    @State private var subscriptionStatus: AppAppSubscriptionStatus = .expired
+    @State private var subscriptionStatus: AppSubscriptionStatus = .expired
     @State private var showPaywall = false
 
     var body: some View {
@@ -124,9 +124,9 @@ struct SubscriptionStatusIndicator: View {
 
 /// Compact subscription status indicator for navigation bars
 @available(iOS 15.0, *)
-struct CompactAppSubscriptionStatusIndicator: View {
+struct CompactSubscriptionStatusIndicator: View {
     @StateObject private var subscriptionService = SubscriptionService()
-    @State private var subscriptionStatus: AppAppSubscriptionStatus = .expired
+    @State private var subscriptionStatus: AppSubscriptionStatus = .expired
     @State private var showPaywall = false
 
     var body: some View {
@@ -254,12 +254,12 @@ struct PremiumFeatureGate: View {
 
 #if DEBUG
 @available(iOS 15.0, *)
-struct AppSubscriptionStatusIndicator_Previews: PreviewProvider {
+struct SubscriptionStatusIndicator_Previews: PreviewProvider {
     static var previews: some View {
         VStack(spacing: 20) {
-            AppSubscriptionStatusIndicator()
+            SubscriptionStatusIndicator()
 
-            CompactAppSubscriptionStatusIndicator()
+            CompactSubscriptionStatusIndicator()
 
             PremiumFeatureGate(
                 feature: "Unlimited Children",
