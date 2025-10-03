@@ -1,6 +1,7 @@
 import Foundation
 import CloudKit
 import SwiftUI
+import Combine
 import OSLog
 import SharedModels
 import RewardCore
@@ -36,7 +37,11 @@ public class iCloudAuthenticationService: ObservableObject {
     }
 
     deinit {
-        stopPeriodicStatusChecks()
+        // Stop periodic status checks
+        // Since this is called from deinit, we can't use async/await
+        // We'll just invalidate the timer directly
+        statusCheckTimer?.invalidate()
+        statusCheckTimer = nil
     }
 
     // MARK: - Public Authentication Methods
@@ -89,7 +94,7 @@ public class iCloudAuthenticationService: ObservableObject {
                 showAuthenticationError(.undeterminedStatus)
                 return false
 
-            @unknown default:
+            default:
                 showAuthenticationError(.unknownError("Unknown account status"))
                 return false
             }
@@ -225,7 +230,7 @@ public class iCloudAuthenticationService: ObservableObject {
             return .restricted
         case .couldNotDetermine:
             return .couldNotDetermine
-        @unknown default:
+        default:
             return .couldNotDetermine
         }
     }

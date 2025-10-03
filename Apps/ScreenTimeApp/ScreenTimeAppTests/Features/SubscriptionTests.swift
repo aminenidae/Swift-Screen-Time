@@ -1,5 +1,4 @@
 import XCTest
-import Testing
 @testable import ScreenTimeApp
 
 @available(iOS 15.0, *)
@@ -7,44 +6,38 @@ final class SubscriptionTests: XCTestCase {
 
     // MARK: - Subscription Views Tests
 
-    @Test("PaywallView initializes correctly")
-    func testPaywallViewInitialization() async throws {
+    func testPaywallViewInitialization() {
         let paywallView = PaywallView()
-        #expect(paywallView != nil)
+        XCTAssertNotNil(paywallView)
     }
 
-    @Test("SubscriptionManagementView initializes correctly")
-    func testSubscriptionManagementViewInitialization() async throws {
+    func testSubscriptionManagementViewInitialization() {
         let managementView = SubscriptionManagementView()
-        #expect(managementView != nil)
+        XCTAssertNotNil(managementView)
     }
 
-    @Test("SubscriptionOnboardingView initializes correctly")
-    func testSubscriptionOnboardingViewInitialization() async throws {
+    func testSubscriptionOnboardingViewInitialization() {
         let onboardingView = SubscriptionOnboardingView {
             // Test completion handler
         }
-        #expect(onboardingView != nil)
+        XCTAssertNotNil(onboardingView)
     }
 
-    @Test("SubscriptionStatusIndicator initializes correctly")
-    func testSubscriptionStatusIndicatorInitialization() async throws {
+    func testSubscriptionStatusIndicatorInitialization() {
         let statusIndicator = SubscriptionStatusIndicator()
-        #expect(statusIndicator != nil)
+        XCTAssertNotNil(statusIndicator)
     }
 
-    @Test("TrialCountdownBanner displays correctly")
-    func testTrialCountdownBanner() async throws {
+    func testTrialCountdownBanner() {
         let banner = TrialCountdownBanner(daysRemaining: 3) {
             // Test upgrade action
         }
-        #expect(banner != nil)
+        XCTAssertNotNil(banner)
     }
 
     // MARK: - Upgrade Prompts Tests
 
-    @Test("FeatureLimitUpgradePrompt initializes correctly")
-    func testFeatureLimitUpgradePrompt() async throws {
+    func testFeatureLimitUpgradePrompt() {
         let prompt = FeatureLimitUpgradePrompt(
             title: "Test Title",
             message: "Test Message",
@@ -52,58 +45,51 @@ final class SubscriptionTests: XCTestCase {
             onUpgrade: {},
             onDismiss: {}
         )
-        #expect(prompt != nil)
+        XCTAssertNotNil(prompt)
     }
 
-    @Test("ContextualUpgradePrompt initializes correctly")
-    func testContextualUpgradePrompt() async throws {
+    func testContextualUpgradePrompt() {
         let prompt = ContextualUpgradePrompt(context: .childLimit)
-        #expect(prompt != nil)
+        XCTAssertNotNil(prompt)
     }
 
-    @Test("SmartUpgradePrompt initializes correctly")
-    func testSmartUpgradePrompt() async throws {
+    func testSmartUpgradePrompt() {
         let prompt = SmartUpgradePrompt()
-        #expect(prompt != nil)
+        XCTAssertNotNil(prompt)
     }
 
-    @Test("NavigationUpgradePrompt initializes correctly")
-    func testNavigationUpgradePrompt() async throws {
+    func testNavigationUpgradePrompt() {
         let prompt = NavigationUpgradePrompt()
-        #expect(prompt != nil)
+        XCTAssertNotNil(prompt)
     }
 
     // MARK: - Subscription Components Tests
 
-    @Test("ProgressIndicator calculates steps correctly")
-    func testProgressIndicator() async throws {
+    func testProgressIndicator() {
         let indicator = ProgressIndicator(currentStep: 1, totalSteps: 3)
-        #expect(indicator != nil)
+        XCTAssertNotNil(indicator)
     }
 
-    @Test("OnboardingBenefit displays content correctly")
-    func testOnboardingBenefit() async throws {
+    func testOnboardingBenefit() {
         let benefit = OnboardingBenefit(
             icon: "person.3.fill",
             title: "Unlimited Children",
             description: "Add as many children as you need"
         )
-        #expect(benefit != nil)
+        XCTAssertNotNil(benefit)
     }
 
-    @Test("FeatureComparison shows premium features")
-    func testFeatureComparison() async throws {
+    func testFeatureComparison() {
         let comparison = FeatureComparison(
             feature: "Children",
             freeValue: "Up to 2",
             premiumValue: "Unlimited",
             isPremium: true
         )
-        #expect(comparison != nil)
+        XCTAssertNotNil(comparison)
     }
 
-    @Test("PricingCard displays subscription details")
-    func testPricingCard() async throws {
+    func testPricingCard() {
         let card = PricingCard(
             title: "Premium",
             price: "$4.99",
@@ -111,112 +97,104 @@ final class SubscriptionTests: XCTestCase {
             features: ["Feature 1", "Feature 2"],
             isRecommended: true
         )
-        #expect(card != nil)
+        XCTAssertNotNil(card)
     }
 
     // MARK: - Subscription Integration Tests
 
-    @Test("Subscription settings integration works")
-    func testSubscriptionSettingsIntegration() async throws {
+    func testSubscriptionSettingsIntegration() {
         let settingsView = ParentSettingsView()
-        #expect(settingsView != nil)
+        XCTAssertNotNil(settingsView)
 
         // Test that subscription view is integrated
         let subscriptionView = SubscriptionView()
-        #expect(subscriptionView != nil)
+        XCTAssertNotNil(subscriptionView)
     }
 
-    @Test("Subscription status indicators appear in main views")
-    func testSubscriptionStatusIndicatorIntegration() async throws {
+    func testSubscriptionStatusIndicatorIntegration() {
         // Test child dashboard integration
         let childMainView = ChildMainView()
-        #expect(childMainView != nil)
+        XCTAssertNotNil(childMainView)
 
         // Test parent dashboard integration
         let familyOverviewView = FamilyOverviewView()
-        #expect(familyOverviewView != nil)
+        XCTAssertNotNil(familyOverviewView)
 
         // Test rewards view integration
         let rewardsView = RewardsView()
-        #expect(rewardsView != nil)
+        XCTAssertNotNil(rewardsView)
     }
 
     // MARK: - Subscription Workflow Tests
 
-    @Test("Subscription onboarding flow works end-to-end")
-    func testSubscriptionOnboardingFlow() async throws {
+    func testSubscriptionOnboardingFlow() {
         var onboardingCompleted = false
 
         let onboardingView = SubscriptionOnboardingView {
             onboardingCompleted = true
         }
 
-        #expect(onboardingView != nil)
-        #expect(onboardingCompleted == false) // Should start as false
+        XCTAssertNotNil(onboardingView)
+        XCTAssertFalse(onboardingCompleted) // Should start as false
     }
 
-    @Test("Paywall integration with completion handler works")
-    func testPaywallCompletionHandler() async throws {
+    func testPaywallCompletionHandler() {
         var purchaseCompleted = false
 
         let paywallView = PaywallView {
             purchaseCompleted = true
         }
 
-        #expect(paywallView != nil)
-        #expect(purchaseCompleted == false) // Should start as false
+        XCTAssertNotNil(paywallView)
+        XCTAssertFalse(purchaseCompleted) // Should start as false
     }
 
     // MARK: - Upgrade Context Tests
 
-    @Test("UpgradeContext provides correct information")
-    func testUpgradeContext() async throws {
+    func testUpgradeContext() {
         let childLimitContext = UpgradeContext.childLimit
-        #expect(childLimitContext.icon == "person.3.fill")
-        #expect(childLimitContext.title == "Child Limit Reached")
-        #expect(!childLimitContext.subtitle.isEmpty)
+        XCTAssertEqual(childLimitContext.icon, "person.3.fill")
+        XCTAssertEqual(childLimitContext.title, "Child Limit Reached")
+        XCTAssertFalse(childLimitContext.subtitle.isEmpty)
 
         let analyticsContext = UpgradeContext.analytics
-        #expect(analyticsContext.icon == "chart.bar.fill")
-        #expect(analyticsContext.title == "Advanced Analytics")
-        #expect(!analyticsContext.subtitle.isEmpty)
+        XCTAssertEqual(analyticsContext.icon, "chart.bar.fill")
+        XCTAssertEqual(analyticsContext.title, "Advanced Analytics")
+        XCTAssertFalse(analyticsContext.subtitle.isEmpty)
 
         let cloudSyncContext = UpgradeContext.cloudSync
-        #expect(cloudSyncContext.icon == "icloud.fill")
-        #expect(cloudSyncContext.title == "Cloud Sync Available")
-        #expect(!cloudSyncContext.subtitle.isEmpty)
+        XCTAssertEqual(cloudSyncContext.icon, "icloud.fill")
+        XCTAssertEqual(cloudSyncContext.title, "Cloud Sync Available")
+        XCTAssertFalse(cloudSyncContext.subtitle.isEmpty)
 
         let notificationsContext = UpgradeContext.notifications
-        #expect(notificationsContext.icon == "bell.fill")
-        #expect(notificationsContext.title == "Smart Notifications")
-        #expect(!notificationsContext.subtitle.isEmpty)
+        XCTAssertEqual(notificationsContext.icon, "bell.fill")
+        XCTAssertEqual(notificationsContext.title, "Smart Notifications")
+        XCTAssertFalse(notificationsContext.subtitle.isEmpty)
     }
 
     // MARK: - Component Integration Tests
 
-    @Test("UpgradeFeatureRow displays correctly")
-    func testUpgradeFeatureRow() async throws {
+    func testUpgradeFeatureRow() {
         let featureRow = UpgradeFeatureRow(
             icon: "person.3.fill",
             text: "Unlimited children"
         )
-        #expect(featureRow != nil)
+        XCTAssertNotNil(featureRow)
     }
 
-    @Test("CompactSubscriptionStatusIndicator works")
-    func testCompactSubscriptionStatusIndicator() async throws {
+    func testCompactSubscriptionStatusIndicator() {
         let compactIndicator = CompactSubscriptionStatusIndicator()
-        #expect(compactIndicator != nil)
+        XCTAssertNotNil(compactIndicator)
     }
 
-    @Test("PremiumFeatureGate displays upgrade option")
-    func testPremiumFeatureGate() async throws {
+    func testPremiumFeatureGate() {
         let featureGate = PremiumFeatureGate(
             feature: "Unlimited Children",
             description: "Add as many children as you need to your family",
             icon: "person.3.fill"
         )
-        #expect(featureGate != nil)
+        XCTAssertNotNil(featureGate)
     }
 }
 
@@ -237,7 +215,6 @@ final class SubscriptionUITests: XCTestCase {
         app = nil
     }
 
-    @MainActor
     func testSubscriptionSettingsNavigation() throws {
         // Navigate to parent role
         let parentButton = app.buttons["I'm a Parent"]
@@ -259,7 +236,6 @@ final class SubscriptionUITests: XCTestCase {
         }
     }
 
-    @MainActor
     func testSubscriptionStatusIndicatorVisibility() throws {
         // Navigate to child dashboard
         let childButton = app.buttons["I'm a Child"]
@@ -272,7 +248,6 @@ final class SubscriptionUITests: XCTestCase {
         XCTAssertTrue(dashboardView.waitForExistence(timeout: 5))
     }
 
-    @MainActor
     func testUpgradePromptInteraction() throws {
         // This test would simulate hitting a feature limit and seeing an upgrade prompt
         // Implementation would depend on specific feature gates and upgrade triggers

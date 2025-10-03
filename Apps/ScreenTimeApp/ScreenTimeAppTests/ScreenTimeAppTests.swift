@@ -5,77 +5,69 @@
 //  Created by Amine Nidae on 2025-09-25.
 //
 
-import Testing
+import XCTest
 import SwiftUI
 @testable import ScreenTimeApp
 
-@Suite("Main App Architecture Tests")
-struct ScreenTimeAppTests {
+@available(iOS 15.0, *)
+final class ScreenTimeAppTests: XCTestCase {
 
-    @Test("ContentView initializes correctly")
-    func testContentViewInitialization() async throws {
+    func testContentViewInitialization() {
         let contentView = ContentView()
-        #expect(contentView != nil)
+        XCTAssertNotNil(contentView)
     }
 
-    @Test("OnboardingView initializes correctly")
-    func testOnboardingViewInitialization() async throws {
+    func testOnboardingViewInitialization() {
         let onboardingView = OnboardingView()
-        #expect(onboardingView != nil)
+        XCTAssertNotNil(onboardingView)
     }
 
-    @Test("AuthenticatedParentView wraps content correctly")
-    func testAuthenticatedParentView() async throws {
+    func testAuthenticatedParentView() {
         let authenticatedView = AuthenticatedParentView {
             Text("Test Content")
         }
-        #expect(authenticatedView != nil)
+        XCTAssertNotNil(authenticatedView)
     }
 }
 
-@Suite("App Navigation Tests")
-struct AppNavigationTests {
+@available(iOS 15.0, *)
+final class AppNavigationTests: XCTestCase {
 
-    @Test("Role-based navigation works correctly")
-    func testRoleBasedNavigation() async throws {
+    func testRoleBasedNavigation() {
         // Test navigation based on userRole AppStorage
         let contentView = ContentView()
-        #expect(contentView != nil)
+        XCTAssertNotNil(contentView)
     }
 
-    @Test("Onboarding flow navigation")
-    func testOnboardingFlow() async throws {
+    func testOnboardingFlow() {
         // Test onboarding completion flow
         let onboardingView = OnboardingView()
-        #expect(onboardingView != nil)
+        XCTAssertNotNil(onboardingView)
     }
 }
 
-@Suite("Modular Architecture Tests")
-struct ModularArchitectureTests {
+@available(iOS 15.0, *)
+final class ModularArchitectureTests: XCTestCase {
 
-    @Test("All feature modules are accessible")
-    func testFeatureModuleAccessibility() async throws {
+    func testFeatureModuleAccessibility() {
         // Test that all modularized features are accessible
-        #expect(ChildMainView() != nil)
-        #expect(ParentMainView() != nil)
-        #expect(RewardsView() != nil)
-        #expect(ChildProfileView() != nil)
-        #expect(FamilyOverviewView() != nil)
-        #expect(ParentSettingsView() != nil)
+        XCTAssertNotNil(ChildMainView())
+        XCTAssertNotNil(ParentMainView())
+        XCTAssertNotNil(RewardsView())
+        XCTAssertNotNil(ChildProfileView())
+        XCTAssertNotNil(FamilyOverviewView())
+        XCTAssertNotNil(ParentSettingsView())
     }
 
-    @Test("Forward declarations work correctly")
-    func testForwardDeclarations() async throws {
+    func testForwardDeclarations() {
         // Test that forward declared views initialize without errors
-        #expect(OnboardingView() != nil)
+        XCTAssertNotNil(OnboardingView())
     }
 
-    @Test("Module separation is maintained")
-    func testModuleSeparation() async throws {
+    func testModuleSeparation() {
         // This test verifies that the modular architecture is properly separated
         // In a more comprehensive test, we would verify that modules don't have
         // unwanted dependencies on each other
-        #expect(true) // Placeholder for architectural validation
+        XCTAssertTrue(true) // Placeholder for architectural validation
     }
 }

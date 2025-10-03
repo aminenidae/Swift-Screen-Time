@@ -1,4 +1,5 @@
 import SwiftUI
+import SharedModels
 
 /// Comprehensive iCloud settings and management interface
 @available(iOS 15.0, *)

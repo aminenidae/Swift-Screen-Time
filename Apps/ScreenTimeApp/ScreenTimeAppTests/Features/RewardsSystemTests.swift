@@ -5,23 +5,21 @@
 //  Created on 2025-10-02.
 //
 
-import Testing
+import XCTest
 import SwiftUI
 import FamilyControlsKit
 import SharedModels
 @testable import ScreenTimeApp
 
-@Suite("Rewards System Tests")
-struct RewardsSystemTests {
+@available(iOS 15.0, *)
+final class RewardsSystemTests: XCTestCase {
 
-    @Test("RewardsView initializes correctly")
-    func testRewardsViewInitialization() async throws {
+    func testRewardsViewInitialization() {
         let rewardsView = RewardsView()
-        #expect(rewardsView != nil)
+        XCTAssertNotNil(rewardsView)
     }
 
-    @Test("EntertainmentAppUnlockCard displays correctly")
-    func testEntertainmentAppUnlockCard() async throws {
+    func testEntertainmentAppUnlockCard() {
         let mockApp = FamilyControlsKit.EntertainmentAppConfig(
             bundleID: "com.test.app",
             displayName: "Test App",
@@ -37,11 +35,10 @@ struct RewardsSystemTests {
             isUnlocked: false,
             onUnlock: { _ in }
         )
-        #expect(unlockCard != nil)
+        XCTAssertNotNil(unlockCard)
     }
 
-    @Test("DurationOptionButton functionality")
-    func testDurationOptionButton() async throws {
+    func testDurationOptionButton() {
         var tapped = false
         let button = DurationOptionButton(
             duration: 30,
@@ -49,11 +46,10 @@ struct RewardsSystemTests {
             canAfford: true,
             onTap: { tapped = true }
         )
-        #expect(button != nil)
+        XCTAssertNotNil(button)
     }
 
-    @Test("RedeemedReward model works correctly")
-    func testRedeemedRewardModel() async throws {
+    func testRedeemedRewardModel() {
         let reward = RedeemedReward(
             id: UUID(),
             name: "Test Reward",
@@ -62,21 +58,20 @@ struct RewardsSystemTests {
             status: .pending
         )
 
-        #expect(reward.name == "Test Reward")
-        #expect(reward.cost == 50)
-        #expect(reward.status == .pending)
-        #expect(reward.status.text == "Pending Approval")
-        #expect(reward.status.color == .orange)
+        XCTAssertEqual(reward.name, "Test Reward")
+        XCTAssertEqual(reward.cost, 50)
+        XCTAssertEqual(reward.status, .pending)
+        XCTAssertEqual(reward.status.text, "Pending Approval")
+        XCTAssertEqual(reward.status.color, .orange)
     }
 
-    @Test("RedemptionStatus enum works correctly")
-    func testRedemptionStatus() async throws {
-        #expect(RedemptionStatus.pending.text == "Pending Approval")
-        #expect(RedemptionStatus.approved.text == "Approved")
-        #expect(RedemptionStatus.denied.text == "Denied")
+    func testRedemptionStatus() {
+        XCTAssertEqual(RedemptionStatus.pending.text, "Pending Approval")
+        XCTAssertEqual(RedemptionStatus.approved.text, "Approved")
+        XCTAssertEqual(RedemptionStatus.denied.text, "Denied")
 
-        #expect(RedemptionStatus.pending.color == .orange)
-        #expect(RedemptionStatus.approved.color == .green)
-        #expect(RedemptionStatus.denied.color == .red)
+        XCTAssertEqual(RedemptionStatus.pending.color, .orange)
+        XCTAssertEqual(RedemptionStatus.approved.color, .green)
+        XCTAssertEqual(RedemptionStatus.denied.color, .red)
     }
 }

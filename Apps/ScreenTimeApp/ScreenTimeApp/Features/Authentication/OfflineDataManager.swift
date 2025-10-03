@@ -1,5 +1,7 @@
 import Foundation
 import CoreData
+import SwiftUI
+import Combine
 import OSLog
 import SharedModels
 
@@ -60,7 +62,7 @@ public class OfflineDataManager: ObservableObject {
             return
         }
 
-        logger.info("Processing \(offlineQueue.count) offline operations")
+        logger.info("Processing \(self.offlineQueue.count) offline operations")
         isProcessingOfflineData = true
 
         var processedOperations: [OfflineOperation] = []
@@ -144,7 +146,7 @@ public class OfflineDataManager: ObservableObject {
         do {
             let data = try JSONEncoder().encode(offlineQueue)
             userDefaults.set(data, forKey: queueKey)
-            logger.debug("Saved offline queue with \(offlineQueue.count) operations")
+            logger.debug("Saved offline queue with \(self.offlineQueue.count) operations")
         } catch {
             logger.error("Failed to save offline queue: \(error.localizedDescription)")
         }
@@ -332,24 +334,24 @@ private struct DeviceInfo: Codable {
 
 extension OfflineDataManager {
     /// Quick method to queue a point transaction
-    public func queuePointTransaction(_ transaction: Any) {
-        if let data = try? JSONEncoder().encode(transaction as! Codable) {
+    public func queuePointTransaction<T: Codable>(_ transaction: T) {
+        if let data = try? JSONEncoder().encode(transaction) {
             let operation = OfflineOperation(type: .pointTransaction, data: data)
             queueOfflineOperation(operation)
         }
     }
 
     /// Quick method to queue a usage session
-    public func queueUsageSession(_ session: Any) {
-        if let data = try? JSONEncoder().encode(session as! Codable) {
+    public func queueUsageSession<T: Codable>(_ session: T) {
+        if let data = try? JSONEncoder().encode(session) {
             let operation = OfflineOperation(type: .usageSession, data: data)
             queueOfflineOperation(operation)
         }
     }
 
     /// Quick method to queue a reward redemption
-    public func queueRewardRedemption(_ redemption: Any) {
-        if let data = try? JSONEncoder().encode(redemption as! Codable) {
+    public func queueRewardRedemption<T: Codable>(_ redemption: T) {
+        if let data = try? JSONEncoder().encode(redemption) {
             let operation = OfflineOperation(type: .rewardRedemption, data: data)
             queueOfflineOperation(operation)
         }

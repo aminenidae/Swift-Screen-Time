@@ -1,10 +1,11 @@
 import Foundation
+import SwiftUI
 import SharedModels
 
 // MARK: - Analytics Consent Service
 
 /// Service responsible for managing analytics consent levels
-public class AnalyticsConsentService: @unchecked Sendable {
+public class AnalyticsConsentService: ObservableObject, @unchecked Sendable {
     private let repository: AnalyticsConsentRepository?
     private var cachedConsents: [String: AnalyticsConsent] = [:] // familyID: consent
     private let cacheQueue = DispatchQueue(label: "analytics-consent-cache", attributes: .concurrent)

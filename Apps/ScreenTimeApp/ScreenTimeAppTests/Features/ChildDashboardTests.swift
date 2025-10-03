@@ -5,63 +5,60 @@
 //  Created on 2025-10-02.
 //
 
-import Testing
+import XCTest
 import SwiftUI
 @testable import ScreenTimeApp
 
-@Suite("Child Dashboard Tests")
-struct ChildDashboardTests {
+@available(iOS 15.0, *)
+final class ChildDashboardTests: XCTestCase {
 
-    @Test("ChildMainView initializes correctly")
-    func testChildMainViewInitialization() async throws {
+    func testChildMainViewInitialization() {
+        // Test that ChildMainView can be created
         let childMainView = ChildMainView()
-        #expect(childMainView != nil)
+        XCTAssertNotNil(childMainView)
     }
 
-    @Test("ChildProfileView initializes correctly")
-    func testChildProfileViewInitialization() async throws {
+    func testChildProfileViewInitialization() {
+        // Test that ChildProfileView can be created
         let childProfileView = ChildProfileView()
-        #expect(childProfileView != nil)
+        XCTAssertNotNil(childProfileView)
     }
 
-    @Test("LearningActivityRow displays correctly")
-    func testLearningActivityRowDisplay() async throws {
+    func testLearningActivityRowDisplay() {
+        // Test that LearningActivityRow can be created
         let activityRow = LearningActivityRow(
             appName: "Khan Academy",
             duration: "25 min",
             pointsEarned: 25,
             timeAgo: "2 hours ago"
         )
-        #expect(activityRow != nil)
+        XCTAssertNotNil(activityRow)
     }
 
-    @Test("StatCard displays correctly")
-    func testStatCardDisplay() async throws {
+    func testStatCardDisplay() {
+        // Test that StatCard can be created
         let statCard = StatCard(
             title: "Total Points",
             value: "1,250",
-            icon: "star.fill",
-            color: .yellow
+            subtitle: "Earned this week" // Fixed the parameter order
         )
-        #expect(statCard != nil)
+        XCTAssertNotNil(statCard)
     }
 }
 
-@Suite("Child Dashboard Integration Tests")
-struct ChildDashboardIntegrationTests {
+@available(iOS 15.0, *)
+final class ChildDashboardIntegrationTests: XCTestCase {
 
-    @Test("Tab navigation works correctly")
-    func testTabNavigation() async throws {
+    func testTabNavigation() {
         // Test that all tabs in ChildMainView are accessible
         let childMainView = ChildMainView()
         // This would test TabView functionality in a real integration test
-        #expect(childMainView != nil)
+        XCTAssertNotNil(childMainView)
     }
 
-    @Test("Profile switcher functionality")
-    func testProfileSwitcher() async throws {
+    func testProfileSwitcher() {
         let childProfileView = ChildProfileView()
         // Test profile switching functionality
-        #expect(childProfileView != nil)
+        XCTAssertNotNil(childProfileView)
     }
 }

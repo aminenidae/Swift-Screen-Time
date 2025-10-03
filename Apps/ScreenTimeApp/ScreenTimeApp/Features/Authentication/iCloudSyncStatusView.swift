@@ -1,4 +1,5 @@
 import SwiftUI
+import SharedModels
 
 /// Sync status indicators for displaying iCloud sync state throughout the app
 @available(iOS 15.0, *)

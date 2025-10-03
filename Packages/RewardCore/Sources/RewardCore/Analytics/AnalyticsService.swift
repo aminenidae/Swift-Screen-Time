@@ -1,4 +1,5 @@
 import Foundation
+import SwiftUI
 import SharedModels
 
 #if canImport(MetricKit) && !os(macOS)
@@ -8,7 +9,7 @@ import MetricKit
 // MARK: - Analytics Service
 
 /// Main service for handling analytics collection with privacy-first design
-public class AnalyticsService: AnalyticsEventCollector, @unchecked Sendable {
+public class AnalyticsService: AnalyticsEventCollector, ObservableObject, @unchecked Sendable {
     private let consentService: AnalyticsConsentService
     private let anonymizationService: DataAnonymizationService
     private let aggregationService: AnalyticsAggregationService

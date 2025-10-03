@@ -1,5 +1,5 @@
 import XCTest
-import Testing
+import SwiftUI
 @testable import ScreenTimeApp
 
 @available(iOS 16.0, *)
@@ -7,69 +7,62 @@ final class AnalyticsTests: XCTestCase {
 
     // MARK: - Analytics Dashboard Tests
 
-    @Test("AnalyticsDashboardView initializes correctly")
-    func testAnalyticsDashboardViewInitialization() async throws {
+    func testAnalyticsDashboardViewInitialization() {
         let dashboardView = AnalyticsDashboardView()
-        #expect(dashboardView != nil)
+        XCTAssertNotNil(dashboardView)
     }
 
-    @Test("Analytics sections render correctly")
-    func testAnalyticsSectionsInitialization() async throws {
+    func testAnalyticsSectionsInitialization() {
         let mockData = createMockAnalyticsData()
 
         let keyMetricsSection = KeyMetricsSection(data: mockData)
-        #expect(keyMetricsSection != nil)
+        XCTAssertNotNil(keyMetricsSection)
 
         let usageTrendsSection = UsageTrendsSection(data: mockData, timeRange: .week)
-        #expect(usageTrendsSection != nil)
+        XCTAssertNotNil(usageTrendsSection)
 
         let appCategorySection = AppCategorySection(data: mockData)
-        #expect(appCategorySection != nil)
+        XCTAssertNotNil(appCategorySection)
 
         let learningProgressSection = LearningProgressSection(data: mockData)
-        #expect(learningProgressSection != nil)
+        XCTAssertNotNil(learningProgressSection)
 
         let screenTimeGoalsSection = ScreenTimeGoalsSection(data: mockData)
-        #expect(screenTimeGoalsSection != nil)
+        XCTAssertNotNil(screenTimeGoalsSection)
 
         let rewardStatisticsSection = RewardStatisticsSection(data: mockData)
-        #expect(rewardStatisticsSection != nil)
+        XCTAssertNotNil(rewardStatisticsSection)
     }
 
-    @Test("Analytics export functionality works")
-    func testAnalyticsExportView() async throws {
+    func testAnalyticsExportView() {
         let mockData = createMockAnalyticsData()
         let exportView = AnalyticsExportView(data: mockData)
-        #expect(exportView != nil)
+        XCTAssertNotNil(exportView)
     }
 
-    @Test("Analytics settings view initializes")
-    func testAnalyticsSettingsView() async throws {
+    func testAnalyticsSettingsView() {
         let settingsView = AnalyticsSettingsView()
-        #expect(settingsView != nil)
+        XCTAssertNotNil(settingsView)
     }
 
-    @Test("Premium analytics view initializes")
-    func testPremiumAnalyticsView() async throws {
+    func testPremiumAnalyticsView() {
         let premiumView = PremiumAnalyticsView()
-        #expect(premiumView != nil)
+        XCTAssertNotNil(premiumView)
     }
 
     // MARK: - Data Model Tests
 
-    @Test("AnalyticsData model creates correctly")
-    func testAnalyticsDataModel() async throws {
+    func testAnalyticsDataModel() {
         let data = createMockAnalyticsData()
 
-        #expect(data.timeRange == .week)
-        #expect(data.childFilter == "all")
-        #expect(data.keyMetrics.totalScreenTime == 420)
-        #expect(data.keyMetrics.learningTime == 180)
-        #expect(data.keyMetrics.pointsEarned == 450)
+        XCTAssertEqual(data.timeRange, .week)
+        XCTAssertEqual(data.childFilter, "all")
+        XCTAssertEqual(data.keyMetrics.totalScreenTime, 420)
+        XCTAssertEqual(data.keyMetrics.learningTime, 180)
+        XCTAssertEqual(data.keyMetrics.pointsEarned, 450)
     }
 
-    @Test("UsageDataPoint model works correctly")
-    func testUsageDataPointModel() async throws {
+    func testUsageDataPointModel() {
         let dataPoint = UsageDataPoint(
             date: Date(),
             screenTime: 60.0,
@@ -77,39 +70,36 @@ final class AnalyticsTests: XCTestCase {
             pointsEarned: 50
         )
 
-        #expect(dataPoint.screenTime == 60.0)
-        #expect(dataPoint.learningTime == 30.0)
-        #expect(dataPoint.pointsEarned == 50)
+        XCTAssertEqual(dataPoint.screenTime, 60.0)
+        XCTAssertEqual(dataPoint.learningTime, 30.0)
+        XCTAssertEqual(dataPoint.pointsEarned, 50)
     }
 
-    @Test("AppCategoryData model works correctly")
-    func testAppCategoryDataModel() async throws {
+    func testAppCategoryDataModel() {
         let categoryData = AppCategoryData(
             category: "Educational",
             timeSpent: 180,
             pointsEarned: 360
         )
 
-        #expect(categoryData.category == "Educational")
-        #expect(categoryData.timeSpent == 180)
-        #expect(categoryData.pointsEarned == 360)
+        XCTAssertEqual(categoryData.category, "Educational")
+        XCTAssertEqual(categoryData.timeSpent, 180)
+        XCTAssertEqual(categoryData.pointsEarned, 360)
     }
 
-    @Test("LearningProgress model works correctly")
-    func testLearningProgressModel() async throws {
+    func testLearningProgressModel() {
         let progress = LearningProgress(
             subject: "Math",
             timeSpent: 45,
             progress: 0.75
         )
 
-        #expect(progress.subject == "Math")
-        #expect(progress.timeSpent == 45)
-        #expect(progress.progress == 0.75)
+        XCTAssertEqual(progress.subject, "Math")
+        XCTAssertEqual(progress.timeSpent, 45)
+        XCTAssertEqual(progress.progress, 0.75)
     }
 
-    @Test("RewardStatistics model works correctly")
-    func testRewardStatisticsModel() async throws {
+    func testRewardStatisticsModel() {
         let stats = RewardStatistics(
             totalPointsEarned: 450,
             totalPointsSpent: 320,
@@ -119,99 +109,91 @@ final class AnalyticsTests: XCTestCase {
             goalAchievementRate: 0.85
         )
 
-        #expect(stats.totalPointsEarned == 450)
-        #expect(stats.totalPointsSpent == 320)
-        #expect(stats.averagePointsPerDay == 64)
-        #expect(stats.mostRedeemed == "Netflix")
-        #expect(stats.streakDays == 5)
-        #expect(stats.goalAchievementRate == 0.85)
+        XCTAssertEqual(stats.totalPointsEarned, 450)
+        XCTAssertEqual(stats.totalPointsSpent, 320)
+        XCTAssertEqual(stats.averagePointsPerDay, 64)
+        XCTAssertEqual(stats.mostRedeemed, "Netflix")
+        XCTAssertEqual(stats.streakDays, 5)
+        XCTAssertEqual(stats.goalAchievementRate, 0.85)
     }
 
     // MARK: - Time Range Tests
 
-    @Test("TimeRange enum works correctly")
-    func testTimeRangeEnum() async throws {
-        #expect(TimeRange.day.rawValue == "Today")
-        #expect(TimeRange.week.rawValue == "This Week")
-        #expect(TimeRange.month.rawValue == "This Month")
-        #expect(TimeRange.year.rawValue == "This Year")
+    func testTimeRangeEnum() {
+        XCTAssertEqual(TimeRange.day.rawValue, "Today")
+        XCTAssertEqual(TimeRange.week.rawValue, "This Week")
+        XCTAssertEqual(TimeRange.month.rawValue, "This Month")
+        XCTAssertEqual(TimeRange.year.rawValue, "This Year")
 
-        #expect(TimeRange.allCases.count == 4)
+        XCTAssertEqual(TimeRange.allCases.count, 4)
     }
 
     // MARK: - Export Format Tests
 
-    @Test("ExportFormat enum works correctly")
-    func testExportFormatEnum() async throws {
-        #expect(ExportFormat.csv.displayName == "CSV")
-        #expect(ExportFormat.json.displayName == "JSON")
-        #expect(ExportFormat.pdf.displayName == "PDF")
+    func testExportFormatEnum() {
+        XCTAssertEqual(ExportFormat.csv.displayName, "CSV")
+        XCTAssertEqual(ExportFormat.json.displayName, "JSON")
+        XCTAssertEqual(ExportFormat.pdf.displayName, "PDF")
 
-        #expect(ExportFormat.csv.fileExtension == "csv")
-        #expect(ExportFormat.json.fileExtension == "json")
-        #expect(ExportFormat.pdf.fileExtension == "pdf")
+        XCTAssertEqual(ExportFormat.csv.fileExtension, "csv")
+        XCTAssertEqual(ExportFormat.json.fileExtension, "json")
+        XCTAssertEqual(ExportFormat.pdf.fileExtension, "pdf")
     }
 
-    @Test("ExportOptions model works correctly")
-    func testExportOptionsModel() async throws {
+    func testExportOptionsModel() {
         let options = ExportOptions(
             includeSummary: true,
             includeRawData: false,
             includeCharts: true
         )
 
-        #expect(options.includeSummary == true)
-        #expect(options.includeRawData == false)
-        #expect(options.includeCharts == true)
+        XCTAssertTrue(options.includeSummary)
+        XCTAssertFalse(options.includeRawData)
+        XCTAssertTrue(options.includeCharts)
     }
 
     // MARK: - Premium Analytics Tests
 
-    @Test("PremiumAnalyticsData model works correctly")
-    func testPremiumAnalyticsDataModel() async throws {
+    func testPremiumAnalyticsDataModel() {
         let premiumData = createMockPremiumAnalyticsData()
 
-        #expect(premiumData.screenTimePatterns.averageSessionLength == 23)
-        #expect(premiumData.productivityMetrics.productivityScore == 78)
-        #expect(premiumData.familyComparison.members.count == 3)
-        #expect(premiumData.aiInsights.count == 3)
+        XCTAssertEqual(premiumData.screenTimePatterns.averageSessionLength, 23)
+        XCTAssertEqual(premiumData.productivityMetrics.productivityScore, 78)
+        XCTAssertEqual(premiumData.familyComparison.members.count, 3)
+        XCTAssertEqual(premiumData.aiInsights.count, 3)
     }
 
-    @Test("PremiumMetric enum works correctly")
-    func testPremiumMetricEnum() async throws {
-        #expect(PremiumMetric.screenTimePatterns.displayName == "Screen Time Patterns")
-        #expect(PremiumMetric.productivityMetrics.displayName == "Productivity Metrics")
-        #expect(PremiumMetric.familyComparison.displayName == "Family Comparison")
-        #expect(PremiumMetric.predictiveInsights.displayName == "Predictive Insights")
-        #expect(PremiumMetric.detailedReports.displayName == "Detailed Reports")
+    func testPremiumMetricEnum() {
+        XCTAssertEqual(PremiumMetric.screenTimePatterns.displayName, "Screen Time Patterns")
+        XCTAssertEqual(PremiumMetric.productivityMetrics.displayName, "Productivity Metrics")
+        XCTAssertEqual(PremiumMetric.familyComparison.displayName, "Family Comparison")
+        XCTAssertEqual(PremiumMetric.predictiveInsights.displayName, "Predictive Insights")
+        XCTAssertEqual(PremiumMetric.detailedReports.displayName, "Detailed Reports")
 
-        #expect(PremiumMetric.allCases.count == 5)
+        XCTAssertEqual(PremiumMetric.allCases.count, 5)
     }
 
-    @Test("ComparisonPeriod enum works correctly")
-    func testComparisonPeriodEnum() async throws {
-        #expect(ComparisonPeriod.lastWeek.displayName == "Last Week")
-        #expect(ComparisonPeriod.lastMonth.displayName == "Last Month")
-        #expect(ComparisonPeriod.lastQuarter.displayName == "Last Quarter")
-        #expect(ComparisonPeriod.lastYear.displayName == "Last Year")
+    func testComparisonPeriodEnum() {
+        XCTAssertEqual(ComparisonPeriod.lastWeek.displayName, "Last Week")
+        XCTAssertEqual(ComparisonPeriod.lastMonth.displayName, "Last Month")
+        XCTAssertEqual(ComparisonPeriod.lastQuarter.displayName, "Last Quarter")
+        XCTAssertEqual(ComparisonPeriod.lastYear.displayName, "Last Year")
 
-        #expect(ComparisonPeriod.allCases.count == 4)
+        XCTAssertEqual(ComparisonPeriod.allCases.count, 4)
     }
 
     // MARK: - Integration Tests
 
-    @Test("Analytics integration with settings works")
-    func testAnalyticsSettingsIntegration() async throws {
+    func testAnalyticsSettingsIntegration() {
         let settingsView = ParentSettingsView()
-        #expect(settingsView != nil)
+        XCTAssertNotNil(settingsView)
 
         // Test that ReportsView properly integrates AnalyticsDashboardView
         let reportsView = ReportsView()
-        #expect(reportsView != nil)
+        XCTAssertNotNil(reportsView)
     }
 
-    @Test("Analytics export integration works")
-    func testAnalyticsExportIntegration() async throws {
+    func testAnalyticsExportIntegration() {
         let mockData = createMockAnalyticsData()
         let exporter = AnalyticsExporter()
 
@@ -222,15 +204,14 @@ final class AnalyticsTests: XCTestCase {
             includeCharts: false
         )
 
-        #expect(options.includeSummary == true)
-        #expect(options.includeRawData == true)
-        #expect(options.includeCharts == false)
+        XCTAssertTrue(options.includeSummary)
+        XCTAssertTrue(options.includeRawData)
+        XCTAssertFalse(options.includeCharts)
     }
 
     // MARK: - UI Component Tests
 
-    @Test("MetricCard component works correctly")
-    func testMetricCardComponent() async throws {
+    func testMetricCardComponent() {
         let metricCard = MetricCard(
             title: "Total Screen Time",
             value: "7h 0m",
@@ -238,37 +219,34 @@ final class AnalyticsTests: XCTestCase {
             color: .blue
         )
 
-        #expect(metricCard != nil)
+        XCTAssertNotNil(metricCard)
     }
 
-    @Test("StatCard component works correctly")
-    func testStatCardComponent() async throws {
+    func testStatCardComponent() {
         let statCard = StatCard(
             title: "Points Balance",
             value: "130",
             subtitle: "Available"
         )
 
-        #expect(statCard != nil)
+        XCTAssertNotNil(statCard)
     }
 
-    @Test("SectionHeader component works correctly")
-    func testSectionHeaderComponent() async throws {
+    func testSectionHeaderComponent() {
         let sectionHeader = SectionHeader(
             title: "Overview",
             icon: "chart.bar.fill"
         )
 
-        #expect(sectionHeader != nil)
+        XCTAssertNotNil(sectionHeader)
     }
 
-    @Test("EmptyAnalyticsView component works correctly")
-    func testEmptyAnalyticsViewComponent() async throws {
+    func testEmptyAnalyticsViewComponent() {
         let emptyView = EmptyAnalyticsView {
             // Test refresh action
         }
 
-        #expect(emptyView != nil)
+        XCTAssertNotNil(emptyView)
     }
 
     // MARK: - Helper Methods
@@ -395,7 +373,6 @@ final class AnalyticsUITests: XCTestCase {
         app = nil
     }
 
-    @MainActor
     func testAnalyticsNavigationFromSettings() throws {
         // Navigate to parent role
         let parentButton = app.buttons["I'm a Parent"]
@@ -418,7 +395,6 @@ final class AnalyticsUITests: XCTestCase {
         }
     }
 
-    @MainActor
     func testAnalyticsTimeRangeSelection() throws {
         // Navigate to analytics dashboard (assuming we can get there)
         // This would be implemented based on the navigation structure
@@ -430,7 +406,6 @@ final class AnalyticsUITests: XCTestCase {
         }
     }
 
-    @MainActor
     func testAnalyticsExportFlow() throws {
         // Navigate to analytics dashboard
         // Tap export button

@@ -2,6 +2,7 @@ import SwiftUI
 import FamilyControlsKit
 import SharedModels
 import Foundation
+import SubscriptionService
 
 /// Main rewards view where children can redeem points for entertainment apps and other rewards
 struct RewardsView: View {

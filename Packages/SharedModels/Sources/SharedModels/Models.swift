@@ -517,6 +517,7 @@ public struct SubscriptionEntitlement: Codable, Identifiable {
     }
 }
 
+
 // MARK: - Fraud Prevention Models
 
 public enum FraudDetectionType: String, Codable, CaseIterable {

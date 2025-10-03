@@ -32,9 +32,9 @@ struct ChildProfileView: View {
                             .fontWeight(.semibold)
 
                         HStack(spacing: 20) {
-                            StatCard(title: "Total Points", value: "1,250", icon: "star.fill", color: .yellow)
-                            StatCard(title: "Learning Hours", value: "24.5", icon: "book.fill", color: .green)
-                            StatCard(title: "Current Streak", value: "3", icon: "flame.fill", color: .orange)
+                            ProfileStatCard(title: "Total Points", value: "1,250", icon: "star.fill", color: .yellow)
+                            ProfileStatCard(title: "Learning Hours", value: "24.5", icon: "book.fill", color: .green)
+                            ProfileStatCard(title: "Current Streak", value: "3", icon: "flame.fill", color: .orange)
                         }
                     }
 
@@ -89,8 +89,8 @@ struct ChildProfileView: View {
     }
 }
 
-/// Stat card component for displaying child statistics
-struct StatCard: View {
+/// Profile stat card component for displaying child statistics
+struct ProfileStatCard: View {
     let title: String
     let value: String
     let icon: String

@@ -1,4 +1,5 @@
 import SwiftUI
+import Combine
 import SubscriptionService
 import SharedModels
 import StoreKit
@@ -337,13 +338,11 @@ struct SubscriptionPlanCard: View {
 
     private func getOfferText(_ offer: StoreKit.Product.SubscriptionOffer) -> String {
         switch offer.type {
-        case .freeTrial:
-            return "Free trial available"
         case .introductory:
-            return "Special introductory price"
+            return "Free trial or introductory offer available"
         case .promotional:
             return "Limited time offer"
-        @unknown default:
+        default:
             return "Special offer available"
         }
     }
