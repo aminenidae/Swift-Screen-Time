@@ -13,6 +13,8 @@ import DesignSystem
 import SharedModels
 import CloudKitService
 import SubscriptionService
+import RewardCore
+import Combine
 
 struct ContentView: View {
     @Environment(\.managedObjectContext) private var viewContext
@@ -41,6 +43,17 @@ struct ChildMainView: View {
     @State private var currentPoints: Int = 125
     @State private var dailyGoal: Int = 200
     @State private var todayStreak: Int = 3
+    @State private var pointsEarnedToday: Int = 0
+    @State private var showPointsAnimation = false
+    @State private var lastEarnedPoints: Int = 0
+    @State private var showMilestone = false
+    @State private var hasReachedDailyGoal = false
+
+    // Point tracking integration
+    @StateObject private var pointTrackingService = PointTrackingService.shared
+    @StateObject private var streakTrackingService = StreakTrackingService.shared
+    @State private var childProfileID = "child_123" // TODO: Get from actual child profile
+    @State private var cancellables = Set<AnyCancellable>()
 
     var body: some View {
         TabView {
@@ -49,58 +62,17 @@ struct ChildMainView: View {
                 ScrollView {
                     VStack(spacing: 24) {
                         // Progress Section
-                        VStack(spacing: 16) {
-                            // Progress Ring
-                            ZStack {
-                                Circle()
-                                    .stroke(Color.blue.opacity(0.2), lineWidth: 12)
-                                    .frame(width: 150, height: 150)
-
-                                Circle()
-                                    .trim(from: 0, to: CGFloat(currentPoints) / CGFloat(dailyGoal))
-                                    .stroke(Color.blue, style: StrokeStyle(lineWidth: 12, lineCap: .round))
-                                    .frame(width: 150, height: 150)
-                                    .rotationEffect(.degrees(-90))
-
-                                VStack {
-                                    Text("\(currentPoints)")
-                                        .font(.largeTitle)
-                                        .fontWeight(.bold)
-                                        .foregroundColor(.blue)
-                                    Text("points")
-                                        .font(.caption)
-                                        .foregroundColor(.secondary)
-                                }
-                            }
-
-                            Text("Daily Goal: \(dailyGoal) points")
-                                .font(.subheadline)
-                                .foregroundColor(.secondary)
-                        }
-
-                        // Streak Section
-                        HStack {
-                            Image(systemName: "flame.fill")
-                                .foregroundColor(.orange)
-                                .font(.title2)
-
-                            VStack(alignment: .leading) {
-                                Text("\(todayStreak) Day Streak!")
-                                    .font(.headline)
-                                    .fontWeight(.semibold)
-
-                                Text("Keep learning to maintain your streak")
-                                    .font(.caption)
-                                    .foregroundColor(.secondary)
-                            }
-
-                            Spacer()
-                        }
-                        .padding()
-                        .background(
-                            RoundedRectangle(cornerRadius: 12)
-                                .fill(Color.orange.opacity(0.1))
+                        ProgressDashboard(
+                            dailyPoints: currentPoints,
+                            dailyGoal: dailyGoal,
+                            weeklyPoints: currentPoints * 5, // Simulate weekly data
+                            weeklyGoal: dailyGoal * 7,
+                            currentStreak: streakTrackingService.currentStreak,
+                            longestStreak: streakTrackingService.longestStreak,
+                            learningMinutes: pointsEarnedToday,
+                            learningGoal: 60
                         )
+
 
                         // Recent Activity
                         VStack(alignment: .leading, spacing: 12) {
@@ -159,6 +131,118 @@ struct ChildMainView: View {
                     Image(systemName: "person.fill")
                     Text("Profile")
                 }
+        }
+        .onAppear {
+            setupPointTracking()
+        }
+        .onReceive(pointTrackingService.$pointsEarned) { transaction in
+            if let transaction = transaction {
+                handlePointsEarned(transaction)
+            }
+        }
+        .overlay(
+            // Enhanced points earned animation
+            VStack {
+                if lastEarnedPoints >= 50 {
+                    // Big burst for major rewards
+                    PointsBurstAnimation(
+                        points: lastEarnedPoints,
+                        show: showPointsAnimation
+                    )
+                } else if showPointsAnimation {
+                    // Regular floating notification
+                    FloatingPointsNotification(
+                        points: lastEarnedPoints,
+                        show: showPointsAnimation,
+                        onComplete: {
+                            showPointsAnimation = false
+                        }
+                    )
+                }
+            }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .allowsHitTesting(false),
+            alignment: .center
+        )
+        .overlay(
+            // Milestone celebration
+            MilestoneCelebration(
+                title: "Daily Goal Achieved!",
+                subtitle: "You earned \(dailyGoal) points today!",
+                icon: "trophy.fill",
+                show: showMilestone
+            )
+            .opacity(showMilestone ? 1 : 0)
+        )
+    }
+
+    // MARK: - Point Tracking Methods
+
+    private func setupPointTracking() {
+        Task {
+            do {
+                try await pointTrackingService.startTracking(for: childProfileID)
+                print("✅ Started point tracking for child: \(childProfileID)")
+            } catch {
+                print("❌ Failed to start point tracking: \(error)")
+            }
+        }
+    }
+
+    private func handlePointsEarned(_ transaction: PointTransaction) {
+        let previousPoints = currentPoints
+
+        // Update current points
+        currentPoints += transaction.points
+        pointsEarnedToday += transaction.points
+        lastEarnedPoints = transaction.points
+
+        // Record activity for streak tracking
+        streakTrackingService.recordActivity(
+            for: childProfileID,
+            pointsEarned: transaction.points
+        )
+
+        // Check for daily goal achievement
+        if !hasReachedDailyGoal && currentPoints >= dailyGoal {
+            hasReachedDailyGoal = true
+
+            // Show milestone celebration after a short delay
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
+                withAnimation {
+                    showMilestone = true
+                }
+
+                // Auto-hide milestone after 5 seconds
+                DispatchQueue.main.asyncAfter(deadline: .now() + 5) {
+                    withAnimation {
+                        showMilestone = false
+                    }
+                }
+            }
+        }
+
+        // Show points earned animation
+        withAnimation {
+            showPointsAnimation = true
+        }
+
+        // Auto-hide points animation for floating notification
+        if lastEarnedPoints < 50 {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 2.5) {
+                if showPointsAnimation {
+                    withAnimation {
+                        showPointsAnimation = false
+                    }
+                }
+            }
+        }
+
+        print("🎉 Child earned \(transaction.points) points! Total: \(currentPoints)")
+
+        // Log milestone achievement
+        if hasReachedDailyGoal && previousPoints < dailyGoal {
+            print("🏆 Daily goal achieved! Streak: \(todayStreak)")
         }
     }
 }
@@ -1107,10 +1191,7 @@ struct FamilyOverviewView: View {
                             }
                             .buttonStyle(.plain)
 
-                            NavigationLink(destination: AppCategorizationView()) {
-                                QuickActionCard(title: "App Categories", icon: "apps.iphone", action: {})
-                            }
-                            .buttonStyle(.plain)
+
 
                             NavigationLink(destination: ChildSelectionView(
                                 onChildSelected: { _ in },
@@ -1310,9 +1391,7 @@ struct ParentSettingsView: View {
                         Label("Family Members", systemImage: "person.2.fill")
                     }
 
-                    NavigationLink(destination: AppCategorizationView()) {
-                        Label("App Categories", systemImage: "apps.iphone")
-                    }
+
 
                     NavigationLink(destination: SubscriptionView()) {
                         Label("Subscription", systemImage: "star.fill")
@@ -1322,16 +1401,16 @@ struct ParentSettingsView: View {
                 // Child-Related Settings
                 if !familyMemberService.familyMembers.filter({ $0.isChild }).isEmpty {
                     Section("Child Settings") {
-                        NavigationLink(destination: LearningAppRewardsView()) {
-                            Label("Learning App Points", systemImage: "graduationcap.fill")
+                        NavigationLink(destination: ChildSpecificLearningAppView()) {
+                            Label("Learning App Settings", systemImage: "graduationcap.fill")
                         }
 
-                        NavigationLink(destination: RewardCostConfigurationView()) {
-                            Label("Reward Costs", systemImage: "gift.fill")
+                        NavigationLink(destination: ChildSpecificActivityView()) {
+                            Label("Activity Settings", systemImage: "gift.fill")
                         }
 
-                        NavigationLink(destination: EntertainmentAppCostConfigurationView()) {
-                            Label("Reward App Costs", systemImage: "iphone")
+                        NavigationLink(destination: ChildSpecificRewardAppView()) {
+                            Label("Reward App Settings", systemImage: "iphone")
                         }
 
                         NavigationLink(destination: ChildSelectionView(
@@ -1434,7 +1513,7 @@ struct ChildSelectionView: View {
     @State private var selectedChild: FamilyMemberInfo?
 
     enum ChildSettingDestination {
-        case timeLimits, bedtime, reports, trends
+        case timeLimits, bedtime, reports, trends, learningAppSettings, activitySettings, rewardAppSettings
 
         var title: String {
             switch self {
@@ -1442,6 +1521,9 @@ struct ChildSelectionView: View {
             case .bedtime: return "Bedtime Settings"
             case .reports: return "Detailed Reports"
             case .trends: return "Usage Trends"
+            case .learningAppSettings: return "Learning App Settings"
+            case .activitySettings: return "Activity Settings"
+            case .rewardAppSettings: return "Reward App Settings"
             }
         }
 
@@ -1451,6 +1533,9 @@ struct ChildSelectionView: View {
             case .bedtime: return "Configure bedtime schedules and restrictions"
             case .reports: return "View detailed screen time and learning reports"
             case .trends: return "Analyze usage patterns and trends over time"
+            case .learningAppSettings: return "Configure learning app points for this child"
+            case .activitySettings: return "Configure activity reward costs for this child"
+            case .rewardAppSettings: return "Configure entertainment app unlock costs for this child"
             }
         }
 
@@ -1464,6 +1549,12 @@ struct ChildSelectionView: View {
                 return AnyView(ReportsView())
             case .trends:
                 return AnyView(UsageTrendsView())
+            case .learningAppSettings:
+                return AnyView(LearningAppRewardsView())
+            case .activitySettings:
+                return AnyView(RewardCostConfigurationView())
+            case .rewardAppSettings:
+                return AnyView(EntertainmentAppCostConfigurationView())
             }
         }
     }
@@ -1654,7 +1745,7 @@ struct EntertainmentAppCostConfigurationView: View {
                                 .font(.system(size: 60))
                                 .foregroundColor(.purple)
 
-                            Text("Reward App Costs")
+                            Text("Reward App Settings")
                                 .font(.title)
                                 .fontWeight(.bold)
 
@@ -1756,7 +1847,7 @@ struct EntertainmentAppCostConfigurationView: View {
                 }
             }
         }
-        .navigationTitle("Reward App Costs")
+        .navigationTitle("Reward App Settings")
         .navigationBarTitleDisplayMode(.inline)
         .onAppear {
             loadSavedConfigurations()
@@ -2037,7 +2128,7 @@ struct LearningAppRewardsView: View {
                                 .font(.system(size: 60))
                                 .foregroundColor(.green)
 
-                            Text("Learning App Points")
+                            Text("Learning App Settings")
                                 .font(.title)
                                 .fontWeight(.bold)
 
@@ -2134,7 +2225,7 @@ struct LearningAppRewardsView: View {
                 }
             }
         }
-        .navigationTitle("Learning App Points")
+        .navigationTitle("Learning App Settings")
         .navigationBarTitleDisplayMode(.inline)
         .onAppear {
             if appDiscoveryService.authorizationStatus == .approved && apps.isEmpty {
@@ -2361,7 +2452,7 @@ struct RewardCostConfigurationView: View {
                         .font(.system(size: 60))
                         .foregroundColor(.orange)
 
-                    Text("Reward Costs")
+                    Text("Activity Settings")
                         .font(.title)
                         .fontWeight(.bold)
 
@@ -2445,7 +2536,7 @@ struct RewardCostConfigurationView: View {
             }
             .padding()
         }
-        .navigationTitle("Reward Costs")
+        .navigationTitle("Activity Settings")
         .navigationBarTitleDisplayMode(.inline)
         .sheet(isPresented: $showingAddReward) {
             AddCustomRewardView { rewardName, cost in
@@ -4197,6 +4288,11 @@ struct TimeLimitsView: View {
     @State private var bedtimeStart = Date()
     @State private var bedtimeEnd = Date()
 
+    // App Category Restrictions
+    @State private var educationalAppsRestriction: AppRestrictionLevel = .unlimited
+    @State private var entertainmentAppsRestriction: AppRestrictionLevel = .limited
+    @State private var socialMediaRestriction: AppRestrictionLevel = .restricted
+
     var body: some View {
         NavigationStack {
             Form {
@@ -4222,26 +4318,20 @@ struct TimeLimitsView: View {
                 }
 
                 Section("App Categories") {
-                    HStack {
-                        Text("Educational Apps")
-                        Spacer()
-                        Text("Unlimited")
-                            .foregroundColor(.green)
-                    }
+                    AppCategoryRestrictionButton(
+                        categoryName: "Educational Apps",
+                        restriction: $educationalAppsRestriction
+                    )
 
-                    HStack {
-                        Text("Entertainment Apps")
-                        Spacer()
-                        Text("Limited")
-                            .foregroundColor(.orange)
-                    }
+                    AppCategoryRestrictionButton(
+                        categoryName: "Entertainment Apps",
+                        restriction: $entertainmentAppsRestriction
+                    )
 
-                    HStack {
-                        Text("Social Media")
-                        Spacer()
-                        Text("Restricted")
-                            .foregroundColor(.red)
-                    }
+                    AppCategoryRestrictionButton(
+                        categoryName: "Social Media",
+                        restriction: $socialMediaRestriction
+                    )
                 }
             }
             .navigationTitle("Time Limits")
@@ -4259,6 +4349,55 @@ struct TimeLimitsView: View {
                     }
                 }
             }
+        }
+    }
+}
+
+enum AppRestrictionLevel: String, CaseIterable {
+    case unlimited = "Unlimited"
+    case limited = "Limited"
+    case restricted = "Restricted"
+
+    var color: Color {
+        switch self {
+        case .unlimited: return .green
+        case .limited: return .orange
+        case .restricted: return .red
+        }
+    }
+}
+
+struct AppCategoryRestrictionButton: View {
+    let categoryName: String
+    @Binding var restriction: AppRestrictionLevel
+    @State private var showingActionSheet = false
+
+    var body: some View {
+        Button(action: {
+            showingActionSheet = true
+        }) {
+            HStack {
+                Text(categoryName)
+                    .foregroundColor(.primary)
+                Spacer()
+                Text(restriction.rawValue)
+                    .foregroundColor(restriction.color)
+                    .fontWeight(.medium)
+                Image(systemName: "chevron.right")
+                    .foregroundColor(.secondary)
+                    .font(.caption)
+            }
+        }
+        .actionSheet(isPresented: $showingActionSheet) {
+            ActionSheet(
+                title: Text(categoryName),
+                message: Text("Choose restriction level"),
+                buttons: AppRestrictionLevel.allCases.map { level in
+                    .default(Text(level.rawValue)) {
+                        restriction = level
+                    }
+                } + [.cancel()]
+            )
         }
     }
 }
@@ -4684,6 +4823,40 @@ struct DayUsageRow: View {
                 .cornerRadius(2)
         }
         .padding(.vertical, 4)
+    }
+}
+
+// MARK: - Child-Specific Wrapper Views
+struct ChildSpecificLearningAppView: View {
+    var body: some View {
+        ChildSelectionView(
+            onChildSelected: { child in
+                // Navigation handled by ChildSelectionView internally
+            },
+            destinationType: .learningAppSettings
+        )
+    }
+}
+
+struct ChildSpecificActivityView: View {
+    var body: some View {
+        ChildSelectionView(
+            onChildSelected: { child in
+                // Navigation handled by ChildSelectionView internally
+            },
+            destinationType: .activitySettings
+        )
+    }
+}
+
+struct ChildSpecificRewardAppView: View {
+    var body: some View {
+        ChildSelectionView(
+            onChildSelected: { child in
+                // Navigation handled by ChildSelectionView internally
+            },
+            destinationType: .rewardAppSettings
+        )
     }
 }
 

@@ -6,12 +6,16 @@
 set -e
 
 # Navigate to project root
-cd "$(dirname "$0")"/..
+cd /Users/ameen/Documents/ScreenTimeRewards-Workspace
+
+echo "Current directory: $(pwd)"
+echo "Checking for Configuration/Current.plist:"
+ls -la Configuration/Current.plist 2>&1 || echo "File not found"
 
 # Verify environment configuration
 echo "Verifying environment configuration..."
-if [ -f "Scripts/verify-environment.sh" ]; then
-    Scripts/verify-environment.sh
+if [ -f "Tools/Scripts/verify-environment.sh" ]; then
+    Tools/Scripts/verify-environment.sh
 else
     echo "Environment verification script not found, skipping..."
 fi

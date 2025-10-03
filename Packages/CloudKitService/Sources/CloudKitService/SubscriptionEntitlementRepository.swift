@@ -240,23 +240,4 @@ public final class CloudKitSubscriptionEntitlementRepository: SubscriptionEntitl
 }
 
 // MARK: - Error Types
-
-public enum CloudKitError: LocalizedError {
-    case invalidRecord(String)
-    case networkUnavailable
-    case quotaExceeded
-    case permissionDenied
-
-    public var errorDescription: String? {
-        switch self {
-        case .invalidRecord(let message):
-            return "Invalid CloudKit record: \(message)"
-        case .networkUnavailable:
-            return "Network unavailable for CloudKit operations"
-        case .quotaExceeded:
-            return "CloudKit quota exceeded"
-        case .permissionDenied:
-            return "Permission denied for CloudKit operation"
-        }
-    }
-}
+// CloudKitError is now defined in CloudKitError.swift
