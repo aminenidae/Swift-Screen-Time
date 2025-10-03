@@ -23,12 +23,73 @@ final class ScreenTimeAppUITests: XCTestCase {
     }
 
     @MainActor
-    func testExample() throws {
-        // UI tests must launch the application that they test.
+    func testOnboardingFlow() throws {
         let app = XCUIApplication()
         app.launch()
 
-        // Use XCTAssert and related functions to verify your tests produce the correct results.
+        // Test onboarding flow
+        let parentButton = app.buttons["I'm a Parent"]
+        let childButton = app.buttons["I'm a Child"]
+
+        // Check that onboarding buttons exist
+        XCTAssertTrue(parentButton.waitForExistence(timeout: 5))
+        XCTAssertTrue(childButton.waitForExistence(timeout: 5))
+
+        // Test parent role selection
+        parentButton.tap()
+
+        // After parent selection, should navigate to main parent interface
+        // Add assertions for parent interface elements
+    }
+
+    @MainActor
+    func testChildDashboardFlow() throws {
+        let app = XCUIApplication()
+        app.launch()
+
+        // Select child role
+        let childButton = app.buttons["I'm a Child"]
+        XCTAssertTrue(childButton.waitForExistence(timeout: 5))
+        childButton.tap()
+
+        // Verify child dashboard elements appear
+        let dashboardTab = app.buttons["Dashboard"]
+        let rewardsTab = app.buttons["Rewards"]
+        let profileTab = app.buttons["Profile"]
+
+        XCTAssertTrue(dashboardTab.waitForExistence(timeout: 5))
+        XCTAssertTrue(rewardsTab.waitForExistence(timeout: 5))
+        XCTAssertTrue(profileTab.waitForExistence(timeout: 5))
+
+        // Test tab navigation
+        rewardsTab.tap()
+        profileTab.tap()
+        dashboardTab.tap()
+    }
+
+    @MainActor
+    func testParentDashboardFlow() throws {
+        let app = XCUIApplication()
+        app.launch()
+
+        // Select parent role
+        let parentButton = app.buttons["I'm a Parent"]
+        XCTAssertTrue(parentButton.waitForExistence(timeout: 5))
+        parentButton.tap()
+
+        // Verify parent dashboard tabs
+        let familyTab = app.buttons["Family"]
+        let activityTab = app.buttons["Activity"]
+        let settingsTab = app.buttons["Settings"]
+
+        XCTAssertTrue(familyTab.waitForExistence(timeout: 5))
+        XCTAssertTrue(activityTab.waitForExistence(timeout: 5))
+        XCTAssertTrue(settingsTab.waitForExistence(timeout: 5))
+
+        // Test tab navigation
+        activityTab.tap()
+        settingsTab.tap()
+        familyTab.tap()
     }
 
     @MainActor
