@@ -186,7 +186,12 @@ struct BedtimeSettingsView: View {
 
 struct ReportsView: View {
     var body: some View {
-        Text("Reports View - To be modularized")
+        if #available(iOS 16.0, *) {
+            AnalyticsDashboardView()
+        } else {
+            Text("Analytics requires iOS 16.0 or later")
+                .foregroundColor(.secondary)
+        }
     }
 }
 

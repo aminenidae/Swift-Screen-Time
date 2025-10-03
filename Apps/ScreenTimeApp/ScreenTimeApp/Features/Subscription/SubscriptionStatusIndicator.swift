@@ -3,11 +3,11 @@ import SubscriptionService
 import SharedModels
 
 // Type alias to avoid conflicts with StoreKit
-typealias AppAppSubscriptionStatus = SharedModels.AppSubscriptionStatus
+typealias AppSubscriptionStatus = SharedModels.SubscriptionStatus
 
 /// Subscription status indicator for showing throughout the app
 @available(iOS 15.0, *)
-struct AppSubscriptionStatusIndicator: View {
+struct SubscriptionStatusIndicator: View {
     @StateObject private var subscriptionService = SubscriptionService()
     @State private var subscriptionStatus: AppAppSubscriptionStatus = .expired
     @State private var showPaywall = false
@@ -118,7 +118,7 @@ struct AppSubscriptionStatusIndicator: View {
     private func loadAppSubscriptionStatus() async {
         // In a real app, this would check the actual subscription status
         // For now, we'll simulate having a trial subscription
-        subscriptionStatus = .trial
+        subscriptionStatus = AppSubscriptionStatus.trial
     }
 }
 
@@ -202,7 +202,7 @@ struct CompactAppSubscriptionStatusIndicator: View {
     private func loadAppSubscriptionStatus() async {
         // In a real app, this would check the actual subscription status
         // For now, we'll simulate having a trial subscription
-        subscriptionStatus = .trial
+        subscriptionStatus = AppSubscriptionStatus.trial
     }
 }
 
