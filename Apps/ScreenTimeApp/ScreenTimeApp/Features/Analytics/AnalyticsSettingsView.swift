@@ -70,7 +70,7 @@ struct AnalyticsSettingsView: View {
 
                 Section("Information") {
                     NavigationLink("Privacy Policy") {
-                        PrivacyPolicyView()
+                        AnalyticsPrivacyPolicyView()
                     }
 
                     NavigationLink("How We Use Analytics") {
@@ -303,7 +303,7 @@ struct AnalyticsTechnicalDetailsView: View {
     }
 }
 
-struct PrivacyPolicyView: View {
+struct AnalyticsPrivacyPolicyView: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 16) {

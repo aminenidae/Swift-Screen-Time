@@ -120,10 +120,123 @@ struct ProfileStatCard: View {
     }
 }
 
-// Forward declaration for ProfileSwitcherView - will be modularized later
+// Profile Switcher View - allows switching between parent and child views
 struct ProfileSwitcherView: View {
+    @AppStorage("userRole") private var userRole: String = "parent"
+    @Environment(\.dismiss) private var dismiss
+
     var body: some View {
-        Text("Profile Switcher - To be modularized")
+        NavigationStack {
+            VStack(spacing: 24) {
+                // Header
+                VStack(spacing: 12) {
+                    Image(systemName: "person.2.circle.fill")
+                        .font(.system(size: 60))
+                        .foregroundColor(.blue)
+
+                    Text("Switch Profile")
+                        .font(.title2)
+                        .fontWeight(.bold)
+
+                    Text("Choose your view mode")
+                        .font(.subheadline)
+                        .foregroundColor(.secondary)
+                }
+                .padding(.top, 20)
+
+                // Profile Options
+                VStack(spacing: 16) {
+                    // Parent Profile Option
+                    Button(action: {
+                        userRole = "parent"
+                        dismiss()
+                    }) {
+                        ProfileOptionCard(
+                            title: "Parent View",
+                            subtitle: "Manage family screen time and settings",
+                            icon: "person.circle.fill",
+                            isSelected: userRole == "parent"
+                        )
+                    }
+                    .buttonStyle(.plain)
+
+                    // Child Profile Option
+                    Button(action: {
+                        userRole = "child"
+                        dismiss()
+                    }) {
+                        ProfileOptionCard(
+                            title: "Child View",
+                            subtitle: "View your stats and earned rewards",
+                            icon: "person.crop.circle.fill",
+                            isSelected: userRole == "child"
+                        )
+                    }
+                    .buttonStyle(.plain)
+                }
+
+                Spacer()
+            }
+            .padding()
+            .navigationTitle("Switch Profile")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button("Done") {
+                        dismiss()
+                    }
+                }
+            }
+        }
+    }
+}
+
+// Profile option card component
+struct ProfileOptionCard: View {
+    let title: String
+    let subtitle: String
+    let icon: String
+    let isSelected: Bool
+
+    var body: some View {
+        HStack(spacing: 16) {
+            Image(systemName: icon)
+                .font(.title)
+                .foregroundColor(isSelected ? .white : .blue)
+                .frame(width: 50, height: 50)
+                .background(
+                    Circle()
+                        .fill(isSelected ? Color.blue : Color.blue.opacity(0.1))
+                )
+
+            VStack(alignment: .leading, spacing: 4) {
+                Text(title)
+                    .font(.headline)
+                    .fontWeight(.medium)
+                    .foregroundColor(isSelected ? .white : .primary)
+
+                Text(subtitle)
+                    .font(.caption)
+                    .foregroundColor(isSelected ? .white.opacity(0.8) : .secondary)
+            }
+
+            Spacer()
+
+            if isSelected {
+                Image(systemName: "checkmark.circle.fill")
+                    .font(.title2)
+                    .foregroundColor(.white)
+            }
+        }
+        .padding()
+        .background(
+            RoundedRectangle(cornerRadius: 12)
+                .fill(isSelected ? Color.blue : Color(.secondarySystemBackground))
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: 12)
+                .stroke(isSelected ? Color.blue : Color.clear, lineWidth: 2)
+        )
     }
 }
 

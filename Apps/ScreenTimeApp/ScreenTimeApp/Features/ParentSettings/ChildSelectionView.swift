@@ -57,71 +57,53 @@ struct ChildSelectionView: View {
 
     var body: some View {
         VStack(spacing: 24) {
-            // Header
+            // Header with improved styling
             VStack(spacing: 16) {
                 Image(systemName: "person.2.circle.fill")
                     .font(.system(size: 60))
                     .foregroundColor(.blue)
-
+                
                 Text("Select Child")
                     .font(.title)
                     .fontWeight(.bold)
-
+                
                 Text(destinationType.description)
                     .font(.subheadline)
                     .foregroundColor(.secondary)
                     .multilineTextAlignment(.center)
                     .padding(.horizontal)
             }
-
-            // Children List
+            
+            // Search bar for filtering children
+            TextField("Search children...", text: .constant(""))
+                .textFieldStyle(RoundedBorderTextFieldStyle())
+                .padding(.horizontal)
+            
+            // Children List with improved organization
             if familyMemberService.isLoading {
                 ProgressView("Loading family members...")
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
             } else {
                 let children = familyMemberService.familyMembers.filter { $0.isChild }
-
+                
                 if children.isEmpty {
                     // Empty State
-                    VStack(spacing: 20) {
-                        Image(systemName: "person.2.slash.fill")
-                            .font(.system(size: 50))
-                            .foregroundColor(.orange)
-
-                        Text("No Children Found")
-                            .font(.headline)
-                            .fontWeight(.bold)
-
-                        Text("Set up Family Sharing to add children to your family group.")
-                            .font(.subheadline)
-                            .foregroundColor(.secondary)
-                            .multilineTextAlignment(.center)
-
-                        NavigationLink(destination: FamilySetupView()) {
-                            Text("Family Setup Guide")
-                                .frame(maxWidth: .infinity)
-                                .padding()
-                                .background(Color.blue)
-                                .foregroundColor(.white)
-                                .cornerRadius(12)
-                        }
-                    }
-                    .padding()
+                    EmptyStateView()
                 } else {
                     ScrollView {
                         LazyVStack(spacing: 16) {
                             ForEach(children, id: \.id) { child in
-                                NavigationLink(destination: destinationType.destinationView(for: child)) {
-                                    ChildSelectionCard(child: child)
-                                }
-                                .buttonStyle(.plain)
+                                ChildSelectionCard(child: child)
+                                    .onTapGesture {
+                                        onChildSelected(child)
+                                    }
                             }
                         }
                         .padding()
                     }
                 }
             }
-
+            
             Spacer()
         }
         .navigationTitle(destinationType.title)
@@ -142,24 +124,38 @@ struct ChildSelectionView: View {
     }
 }
 
-/// Card component for selecting a child from the family
+/// Card component for selecting a child from the family with improved styling
 struct ChildSelectionCard: View {
     let child: FamilyMemberInfo
-
+    
     var body: some View {
         HStack(spacing: 16) {
-            // Child Avatar
-            Image(systemName: "person.circle.fill")
-                .font(.system(size: 50))
-                .foregroundColor(.blue)
-
+            // Child Avatar with status indicator
+            ZStack {
+                Image(systemName: "person.circle.fill")
+                    .font(.system(size: 50))
+                    .foregroundColor(.blue)
+                
+                // Status indicator
+                Circle()
+                    .fill(child.hasAppInstalled ? Color.green : Color.orange)
+                    .frame(width: 16, height: 16)
+                    .overlay(
+                        Circle()
+                            .stroke(Color.white, lineWidth: 2)
+                    )
+                    .offset(x: 16, y: 16)
+                    .alignmentGuide(.trailing) { _ in 0 }
+                    .alignmentGuide(.bottom) { _ in 0 }
+            }
+            
             // Child Info
             VStack(alignment: .leading, spacing: 4) {
                 Text(child.name)
                     .font(.headline)
                     .fontWeight(.semibold)
                     .foregroundColor(.primary)
-
+                
                 if child.hasAppInstalled {
                     HStack(spacing: 4) {
                         Image(systemName: "checkmark.circle.fill")
@@ -180,9 +176,9 @@ struct ChildSelectionCard: View {
                     }
                 }
             }
-
+            
             Spacer()
-
+            
             // Arrow
             Image(systemName: "chevron.right")
                 .foregroundColor(.secondary)
@@ -194,6 +190,37 @@ struct ChildSelectionCard: View {
                 .fill(Color(.systemBackground))
                 .shadow(color: .black.opacity(0.05), radius: 4, x: 0, y: 2)
         )
+        .contentShape(Rectangle()) // Make the entire card tappable
+    }
+}
+
+/// Empty state view for when no children are found
+struct EmptyStateView: View {
+    var body: some View {
+        VStack(spacing: 20) {
+            Image(systemName: "person.2.slash.fill")
+                .font(.system(size: 50))
+                .foregroundColor(.orange)
+            
+            Text("No Children Found")
+                .font(.headline)
+                .fontWeight(.bold)
+            
+            Text("Set up Family Sharing to add children to your family group.")
+                .font(.subheadline)
+                .foregroundColor(.secondary)
+                .multilineTextAlignment(.center)
+            
+            NavigationLink(destination: FamilySetupView()) {
+                Text("Family Setup Guide")
+                    .frame(maxWidth: .infinity)
+                    .padding()
+                    .background(Color.blue)
+                    .foregroundColor(.white)
+                    .cornerRadius(12)
+            }
+        }
+        .padding()
     }
 }
 

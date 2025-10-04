@@ -128,12 +128,268 @@ struct FamilyOverviewView: View {
     }
 }
 
-// Forward declarations for views that will be modularized later
+// Family Setup View - Initial family configuration and onboarding
 struct FamilySetupView: View {
+    @StateObject private var familyMemberService = FamilyMemberService()
+    @State private var parentName = ""
+    @State private var familyName = ""
+    @State private var setupStep = 1
+
     var body: some View {
-        Text("Family Setup View - To be modularized")
+        NavigationStack {
+            ScrollView {
+                VStack(spacing: 24) {
+                    // Progress Indicator
+                    VStack(spacing: 8) {
+                        Text("Family Setup")
+                            .font(.largeTitle)
+                            .fontWeight(.bold)
+
+                        Text("Step \(setupStep) of 3")
+                            .font(.subheadline)
+                            .foregroundColor(.secondary)
+
+                        ProgressView(value: Double(setupStep), total: 3.0)
+                            .progressViewStyle(.linear)
+                            .tint(.blue)
+                    }
+                    .padding(.horizontal)
+
+                    // Setup Content
+                    switch setupStep {
+                    case 1:
+                        familyBasicsStep
+                    case 2:
+                        addChildrenStep
+                    case 3:
+                        setupCompleteStep
+                    default:
+                        familyBasicsStep
+                    }
+
+                    Spacer()
+
+                    // Navigation Buttons
+                    VStack(spacing: 12) {
+                        if setupStep < 3 {
+                            Button("Continue") {
+                                withAnimation {
+                                    setupStep += 1
+                                }
+                            }
+                            .frame(maxWidth: .infinity)
+                            .padding()
+                            .background(Color.blue)
+                            .foregroundColor(.white)
+                            .cornerRadius(12)
+                            .disabled(setupStep == 1 && (parentName.isEmpty || familyName.isEmpty))
+                        }
+
+                        if setupStep > 1 {
+                            Button("Back") {
+                                withAnimation {
+                                    setupStep -= 1
+                                }
+                            }
+                            .frame(maxWidth: .infinity)
+                            .padding()
+                            .background(Color(.systemGray5))
+                            .foregroundColor(.primary)
+                            .cornerRadius(12)
+                        }
+                    }
+                    .padding(.horizontal)
+                }
+                .padding()
+            }
+            .navigationTitle("Setup")
+            .navigationBarTitleDisplayMode(.inline)
+        }
+    }
+
+    // MARK: - Setup Steps
+
+    private var familyBasicsStep: some View {
+        VStack(alignment: .leading, spacing: 20) {
+            VStack(alignment: .leading, spacing: 8) {
+                Text("Welcome to ScreenTime Rewards!")
+                    .font(.title2)
+                    .fontWeight(.semibold)
+
+                Text("Let's set up your family to start earning rewards for learning time.")
+                    .font(.subheadline)
+                    .foregroundColor(.secondary)
+            }
+
+            VStack(alignment: .leading, spacing: 16) {
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("Parent Name")
+                        .font(.subheadline)
+                        .fontWeight(.medium)
+
+                    TextField("Your name", text: $parentName)
+                        .textFieldStyle(.roundedBorder)
+                }
+
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("Family Name")
+                        .font(.subheadline)
+                        .fontWeight(.medium)
+
+                    TextField("The Johnson Family", text: $familyName)
+                        .textFieldStyle(.roundedBorder)
+                }
+            }
+        }
+    }
+
+    private var addChildrenStep: some View {
+        VStack(alignment: .leading, spacing: 20) {
+            VStack(alignment: .leading, spacing: 8) {
+                Text("Your Family Members")
+                    .font(.title2)
+                    .fontWeight(.semibold)
+
+                Text("Sync your existing family members from Apple Family Sharing.")
+                    .font(.subheadline)
+                    .foregroundColor(.secondary)
+            }
+
+            // Current Children List
+            if !familyMemberService.familyMembers.filter({ $0.isChild }).isEmpty {
+                VStack(alignment: .leading, spacing: 12) {
+                    Text("Added Children")
+                        .font(.headline)
+                        .fontWeight(.medium)
+
+                    ForEach(familyMemberService.familyMembers.filter { $0.isChild }) { child in
+                        HStack {
+                            Image(systemName: "person.circle.fill")
+                                .foregroundColor(.blue)
+                                .font(.title2)
+
+                            VStack(alignment: .leading) {
+                                Text(child.name)
+                                    .font(.subheadline)
+                                    .fontWeight(.medium)
+
+                                Text(child.hasAppInstalled ? "App Installed" : "Setup Required")
+                                    .font(.caption)
+                                    .foregroundColor(child.hasAppInstalled ? .green : .orange)
+                            }
+
+                            Spacer()
+
+                            Image(systemName: "checkmark.circle.fill")
+                                .foregroundColor(.green)
+                        }
+                        .padding()
+                        .background(
+                            RoundedRectangle(cornerRadius: 12)
+                                .fill(Color(.systemGray6))
+                        )
+                    }
+                }
+            }
+
+            Button("Sync Family Members") {
+                Task {
+                    do {
+                        let members = try await familyMemberService.fetchFamilyMembers()
+                        await MainActor.run {
+                            familyMemberService.familyMembers = members
+                        }
+                    } catch {
+                        print("Error syncing family members: \(error)")
+                    }
+                }
+            }
+            .frame(maxWidth: .infinity)
+            .padding()
+            .background(Color.blue)
+            .foregroundColor(.white)
+            .cornerRadius(12)
+        }
+    }
+
+    private var setupCompleteStep: some View {
+        VStack(spacing: 24) {
+            VStack(spacing: 16) {
+                Image(systemName: "checkmark.circle.fill")
+                    .font(.system(size: 80))
+                    .foregroundColor(.green)
+
+                Text("Setup Complete!")
+                    .font(.title)
+                    .fontWeight(.bold)
+
+                Text("Your family is ready to start earning rewards for learning time.")
+                    .font(.subheadline)
+                    .foregroundColor(.secondary)
+                    .multilineTextAlignment(.center)
+            }
+
+            VStack(alignment: .leading, spacing: 16) {
+                Text("Next Steps:")
+                    .font(.headline)
+                    .fontWeight(.semibold)
+
+                SetupStepRow(
+                    icon: "shield.fill",
+                    title: "Set up Family Controls",
+                    description: "Enable screen time monitoring"
+                )
+
+                SetupStepRow(
+                    icon: "graduationcap.fill",
+                    title: "Configure Learning Apps",
+                    description: "Choose which apps earn rewards"
+                )
+
+                SetupStepRow(
+                    icon: "gift.fill",
+                    title: "Set Reward Goals",
+                    description: "Define daily learning targets"
+                )
+            }
+            .padding()
+            .background(
+                RoundedRectangle(cornerRadius: 12)
+                    .fill(Color(.systemGray6))
+            )
+        }
     }
 }
+
+// MARK: - Supporting Views
+
+struct SetupStepRow: View {
+    let icon: String
+    let title: String
+    let description: String
+
+    var body: some View {
+        HStack(spacing: 12) {
+            Image(systemName: icon)
+                .foregroundColor(.blue)
+                .font(.title2)
+                .frame(width: 30)
+
+            VStack(alignment: .leading, spacing: 2) {
+                Text(title)
+                    .font(.subheadline)
+                    .fontWeight(.medium)
+
+                Text(description)
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+            }
+
+            Spacer()
+        }
+    }
+}
+
 
 #if DEBUG
 struct FamilyOverviewView_Previews: PreviewProvider {
