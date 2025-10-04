@@ -38,7 +38,7 @@ struct ChildSelectionView: View {
         func destinationView(for child: FamilyMemberInfo) -> some View {
             switch self {
             case .timeLimits:
-                return AnyView(TimeLimitsView())
+                return AnyView(BedtimeSettingsView())
             case .bedtime:
                 return AnyView(BedtimeSettingsView())
             case .reports:
@@ -48,9 +48,9 @@ struct ChildSelectionView: View {
             case .learningAppSettings:
                 return AnyView(LearningAppRewardsView())
             case .activitySettings:
-                return AnyView(RewardCostConfigurationView())
+                return AnyView(ChildSpecificRewardAppView())
             case .rewardAppSettings:
-                return AnyView(EntertainmentAppCostConfigurationView())
+                return AnyView(ChildSpecificRewardAppView())
             }
         }
     }

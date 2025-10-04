@@ -40,7 +40,8 @@ final class ChildDashboardTests: XCTestCase {
         let statCard = StatCard(
             title: "Total Points",
             value: "1,250",
-            subtitle: "Earned this week" // Fixed the parameter order
+            icon: "star.fill",
+            color: .yellow
         )
         XCTAssertNotNil(statCard)
     }

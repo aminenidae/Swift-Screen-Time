@@ -106,10 +106,12 @@ public final class FraudPreventionService: ObservableObject {
         )
 
         // 8. Update published properties
+        let finalEvents = detectedEvents
+        let finalScore = totalScore
         await MainActor.run {
-            self.detectedEvents = detectedEvents
-            self.fraudScore = totalScore
-            self.isBlocked = totalScore >= FraudThresholds.blockingThreshold
+            self.detectedEvents = finalEvents
+            self.fraudScore = finalScore
+            self.isBlocked = finalScore >= FraudThresholds.blockingThreshold
         }
 
         return FraudDetectionResult(

@@ -71,6 +71,7 @@ public enum ApplicationCategory {
 
 /// Service responsible for managing Family Controls and ManagedSettings for reward time allocation
 @available(iOS 15.0, macOS 10.15, *)
+@MainActor
 public class FamilyControlsService: ObservableObject {
     public static let shared = FamilyControlsService()
 
@@ -721,10 +722,47 @@ extension FamilyControlsService {
         for redemption: PointToTimeRedemption,
         using appCategorization: AppCategorization
     ) async throws -> RewardTimeAllocationResult {
-        return try await allocateRewardTime(
-            for: redemption,
-            appBundleID: appCategorization.appBundleID
-        )
+        guard isAuthorized else {
+            return .authorizationRequired
+        }
+
+        // Validate redemption is active and not expired
+        guard redemption.status == .active,
+              redemption.expiresAt > Date() else {
+            return .redemptionExpired
+        }
+
+        // Calculate remaining time
+        let remainingMinutes = redemption.timeGrantedMinutes - redemption.timeUsedMinutes
+        guard remainingMinutes > 0 else {
+            return .noTimeRemaining
+        }
+
+        do {
+            // Use new unlocking system
+            let unlockResult = try await unlockApp(
+                bundleID: appCategorization.appBundleID,
+                durationMinutes: remainingMinutes,
+                pointsCost: 0, // Legacy - no point cost for existing redemptions
+                childID: "default"
+            )
+
+            switch unlockResult {
+            case .success:
+                return .success(allocatedMinutes: remainingMinutes)
+            case .authorizationRequired:
+                return .authorizationRequired
+            case .appNotFound:
+                return .systemError("App not found")
+            case .alreadyUnlocked:
+                return .systemError("App already unlocked")
+            case .systemError(let message):
+                return .systemError(message)
+            }
+
+        } catch {
+            return .systemError(error.localizedDescription)
+        }
     }
 
     /// Validates that Family Controls can handle the requested time allocation

@@ -226,7 +226,8 @@ final class AnalyticsTests: XCTestCase {
         let statCard = StatCard(
             title: "Points Balance",
             value: "130",
-            subtitle: "Available"
+            icon: "star.fill",
+            color: .yellow
         )
 
         XCTAssertNotNil(statCard)

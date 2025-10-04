@@ -9,35 +9,12 @@ struct SettingsContainerView: View {
     @State private var pendingDestination: ChildSelectionView.ChildSettingDestination?
     
     var body: some View {
-        TabView {
-            // Dashboard Tab
-            SettingsDashboardView()
-                .tabItem {
-                    Image(systemName: "gear")
-                    Text("Dashboard")
-                }
-            
-            // All Settings Tab
-            ParentSettingsView()
-                .tabItem {
-                    Image(systemName: "list.bullet")
-                    Text("All Settings")
-                }
-            
-            // Preferences Tab
-            NavigationStack {
-                SettingsPreferencesView()
-            }
-            .tabItem {
-                Image(systemName: "gearshape.2")
-                Text("Preferences")
-            }
-        }
+        ParentSettingsView()
     }
     
     /// Navigate to a child-specific setting, showing child selection if needed
     private func navigateToChildSetting(_ destination: ChildSelectionView.ChildSettingDestination) {
-        if let child = selectedChild {
+        if selectedChild != nil {
             // Navigate directly if child is already selected
             // In a real implementation, this would push the appropriate view
         } else {
@@ -56,7 +33,7 @@ extension SettingsContainerView {
             onChildSelected: { child in
                 selectedChild = child
                 showingChildSelection = false
-                if let destination = pendingDestination {
+                if pendingDestination != nil {
                     // Navigate to the pending destination
                     pendingDestination = nil
                 }

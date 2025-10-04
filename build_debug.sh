@@ -15,7 +15,7 @@ echo "Building project..."
 xcodebuild -workspace ScreenTimeRewards.xcworkspace \
   -scheme ScreenTimeApp \
   -configuration Debug \
-  -destination 'platform=iOS Simulator,name=iPhone 15,OS=latest' \
+  -destination 'platform=iOS Simulator,name=iPhone 17 Pro' \
   clean build \
   -quiet
 

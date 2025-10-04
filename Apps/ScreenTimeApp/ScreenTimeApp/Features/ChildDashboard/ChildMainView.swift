@@ -11,6 +11,7 @@ struct ChildMainView: View {
     @State private var currentPoints: Int = 125
     @State private var dailyGoal: Int = 200
     @State private var todayStreak: Int = 3
+    @State private var longestStreak: Int = 7
     @State private var pointsEarnedToday: Int = 0
     @State private var showPointsAnimation = false
     @State private var lastEarnedPoints: Int = 0
@@ -38,8 +39,8 @@ struct ChildMainView: View {
                             dailyGoal: dailyGoal,
                             weeklyPoints: currentPoints * 5, // Simulate weekly data
                             weeklyGoal: dailyGoal * 7,
-                            currentStreak: streakTrackingService.currentStreak,
-                            longestStreak: streakTrackingService.longestStreak,
+                            currentStreak: todayStreak,
+                            longestStreak: longestStreak,
                             learningMinutes: pointsEarnedToday,
                             learningGoal: 60
                         )

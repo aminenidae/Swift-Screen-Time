@@ -79,7 +79,7 @@ struct SettingsDashboardView: View {
                             ], spacing: 16) {
                                 ForEach(quickAccessSettings) { setting in
                                     QuickAccessCard(setting: setting) { destination in
-                                        if let child = selectedChild {
+                                        if selectedChild != nil {
                                             // Navigate to child-specific setting
                                         } else {
                                             // Show child selection first

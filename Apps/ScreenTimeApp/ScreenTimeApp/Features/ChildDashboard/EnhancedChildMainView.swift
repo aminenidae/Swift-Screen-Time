@@ -1,5 +1,6 @@
 import SwiftUI
 import Combine
+import DesignSystem
 
 // Import local models and services
 struct PointTransaction: Codable, Identifiable {
@@ -135,7 +136,7 @@ struct EnhancedChildMainView: View {
                 }
             
             // Enhanced Profile Tab
-            EnhancedChildProfileView()
+            ChildProfileView()
                 .tabItem {
                     Image(systemName: "person.fill")
                     Text("Profile")
@@ -152,21 +153,24 @@ struct EnhancedChildMainView: View {
         .overlay(
             // Enhanced points earned animation
             VStack {
-                if lastEarnedPoints >= 50 {
-                    // Big burst for major rewards
-                    PointsBurstAnimation(
-                        points: lastEarnedPoints,
-                        show: showPointsAnimation
-                    )
-                } else if showPointsAnimation {
-                    // Regular floating notification
-                    FloatingPointsNotification(
-                        points: lastEarnedPoints,
-                        show: showPointsAnimation,
-                        onComplete: {
-                            showPointsAnimation = false
+                if showPointsAnimation {
+                    // Points notification
+                    Text("+\(lastEarnedPoints) Points!")
+                        .font(.title2)
+                        .fontWeight(.bold)
+                        .foregroundColor(.green)
+                        .padding()
+                        .background(
+                            RoundedRectangle(cornerRadius: 12)
+                                .fill(Color.green.opacity(0.1))
+                        )
+                        .scaleEffect(showPointsAnimation ? 1.2 : 1.0)
+                        .animation(.bouncy(duration: 0.5), value: showPointsAnimation)
+                        .onAppear {
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+                                showPointsAnimation = false
+                            }
                         }
-                    )
                 }
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)

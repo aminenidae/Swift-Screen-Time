@@ -25,6 +25,13 @@ struct ParentMainView: View {
                     Image(systemName: "gearshape.fill")
                     Text("Settings")
                 }
+
+            // Account Tab
+            AccountTabView()
+                .tabItem {
+                    Image(systemName: "person.crop.circle.fill")
+                    Text("Account")
+                }
         }
     }
 }
@@ -48,19 +55,7 @@ struct ParentDashboardView: View {
                     // Subscription Status Indicator
                     SubscriptionStatusIndicator()
 
-                    // Today's Summary
-                    VStack(alignment: .leading, spacing: 16) {
-                        Text("Today's Summary")
-                            .font(.title2)
-                            .fontWeight(.bold)
 
-                        HStack(spacing: 16) {
-                            let children = familyMemberService.familyMembers.filter { $0.isChild }
-                            OverviewStatCard(title: "Children", value: "\(children.count)", icon: "person.2.fill", color: .blue)
-                            OverviewStatCard(title: "Total Points", value: "\(mockChildrenData.reduce(0) { $0 + $1.1 }))", icon: "star.fill", color: .yellow)
-                            OverviewStatCard(title: "Active Today", value: "\(mockChildrenData.filter { $0.3 > 0 }.count)", icon: "checkmark.circle.fill", color: .green)
-                        }
-                    }
 
                     // Children Progress
                     VStack(alignment: .leading, spacing: 16) {
@@ -107,8 +102,7 @@ struct ParentDashboardView: View {
                         }
                     }
 
-                    // Quick Settings
-                    SettingsSummaryView()
+
                     
                     // Recent Activity
                     VStack(alignment: .leading, spacing: 16) {
@@ -141,27 +135,7 @@ struct ParentDashboardView: View {
                         }
                     }
 
-                    // Quick Actions
-                    VStack(alignment: .leading, spacing: 16) {
-                        Text("Quick Actions")
-                            .font(.title2)
-                            .fontWeight(.bold)
 
-                        LazyVGrid(columns: [
-                            GridItem(.flexible()),
-                            GridItem(.flexible())
-                        ], spacing: 16) {
-                            NavigationLink(destination: FamilySetupView()) {
-                                QuickActionCard(title: "Family Setup", icon: "house.circle.fill", action: {})
-                            }
-                            .buttonStyle(.plain)
-
-                            NavigationLink(destination: ReportsView()) {
-                                QuickActionCard(title: "Reports", icon: "chart.bar.fill", action: {})
-                            }
-                            .buttonStyle(.plain)
-                        }
-                    }
 
                     Spacer()
                 }
@@ -194,62 +168,54 @@ struct ParentDashboardView: View {
 struct ParentFamilyView: View {
     @StateObject private var familyMemberService = FamilyMemberService()
 
+    private let familyTabItems = [
+        FamilyTabItem(title: "App Categories", icon: "square.grid.2x2.fill", color: .blue, destination: AnyView(ChildSpecificAppCategoriesView())),
+        FamilyTabItem(title: "Learning Apps", icon: "graduationcap.fill", color: .green, destination: AnyView(LearningAppRewardsView())),
+        FamilyTabItem(title: "Reward Apps", icon: "gift.fill", color: .purple, destination: AnyView(ChildSpecificRewardAppView())),
+        FamilyTabItem(title: "Special Rewards", icon: "star.fill", color: .yellow, destination: AnyView(ChildSpecificRewardAppView())),
+        FamilyTabItem(title: "Daily Time Limits", icon: "clock.fill", color: .orange, destination: AnyView(BedtimeSettingsView())),
+        FamilyTabItem(title: "Detailed Reports", icon: "chart.bar.fill", color: .red, destination: AnyView(ReportsView())),
+        FamilyTabItem(title: "Usage Trends", icon: "chart.line.uptrend.xyaxis", color: .indigo, destination: AnyView(UsageTrendsView()))
+    ]
+
     var body: some View {
         NavigationStack {
-            List {
-                // Child Settings
+            ScrollView {
                 if !familyMemberService.familyMembers.filter({ $0.isChild }).isEmpty {
-                    Section("CHILD SETTINGS") {
-                        NavigationLink(destination: ChildSpecificAppCategoriesView()) {
-                            Label("App Categories", systemImage: "square.grid.2x2.fill")
-                        }
-                        NavigationLink(destination: ChildSpecificLearningAppView()) {
-                            Label("Learning Apps", systemImage: "graduationcap.fill")
-                        }
-                        NavigationLink(destination: ChildSpecificRewardAppView()) {
-                            Label("Reward Apps", systemImage: "gift.fill")
-                        }
-                        NavigationLink(destination: ChildSpecificSpecialRewardsView()) {
-                            Label("Special Rewards", systemImage: "star.fill")
-                        }
-                        NavigationLink(destination: BasicTimeLimitsView()) {
-                            Label("Daily Time Limits", systemImage: "clock.fill")
-                        }
-                        NavigationLink(destination: ReportsView()) {
-                            Label("Detailed Reports", systemImage: "chart.bar.fill")
-                        }
-                        NavigationLink(destination: UsageTrendsView()) {
-                            Label("Usage Trends", systemImage: "chart.line.uptrend.xyaxis")
-                        }
-                    }
-                } else {
-                    // Empty state for no children
-                    Section {
-                        VStack(spacing: 16) {
-                            Image(systemName: "person.2.slash.fill")
-                                .font(.system(size: 40))
-                                .foregroundColor(.orange)
-
-                            Text("No children found")
-                                .font(.headline)
-                                .foregroundColor(.secondary)
-
-                            Text("Set up Family Sharing to manage your children's screen time and rewards.")
-                                .font(.subheadline)
-                                .foregroundColor(.secondary)
-                                .multilineTextAlignment(.center)
-
-                            NavigationLink(destination: FamilySetupView()) {
-                                Text("Set up Family Sharing")
-                                    .frame(maxWidth: .infinity)
-                                    .padding()
-                                    .background(Color.blue)
-                                    .foregroundColor(.white)
-                                    .cornerRadius(12)
+                    LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 16) {
+                        ForEach(familyTabItems) { item in
+                            NavigationLink(destination: item.destination) {
+                                FamilyTabCard(item: item)
                             }
                         }
-                        .padding()
                     }
+                    .padding()
+                } else {
+                    // Empty state for no children
+                    VStack(spacing: 16) {
+                        Image(systemName: "person.2.slash.fill")
+                            .font(.system(size: 40))
+                            .foregroundColor(.orange)
+
+                        Text("No children found")
+                            .font(.headline)
+                            .foregroundColor(.secondary)
+
+                        Text("Set up Family Sharing to manage your children's screen time and rewards.")
+                            .font(.subheadline)
+                            .foregroundColor(.secondary)
+                            .multilineTextAlignment(.center)
+
+                        NavigationLink(destination: FamilySetupView()) {
+                            Text("Set up Family Sharing")
+                                .frame(maxWidth: .infinity)
+                                .padding()
+                                .background(Color.blue)
+                                .foregroundColor(.white)
+                                .cornerRadius(12)
+                        }
+                    }
+                    .padding()
                 }
             }
             .navigationTitle("Family")
@@ -267,6 +233,44 @@ struct ParentFamilyView: View {
                 print("Error loading family members: \(error)")
             }
         }
+    }
+}
+
+/// Model for family tab items
+struct FamilyTabItem: Identifiable {
+    let id = UUID()
+    let title: String
+    let icon: String
+    let color: Color
+    let destination: AnyView
+}
+
+/// Card view for family tab items
+struct FamilyTabCard: View {
+    let item: FamilyTabItem
+
+    var body: some View {
+        VStack(spacing: 12) {
+            Image(systemName: item.icon)
+                .font(.title2)
+                .foregroundColor(.white)
+                .frame(width: 40, height: 40)
+                .background(Circle().fill(item.color))
+
+            Text(item.title)
+                .font(.subheadline)
+                .fontWeight(.medium)
+                .foregroundColor(.primary)
+                .multilineTextAlignment(.center)
+        }
+        .padding()
+        .frame(maxWidth: .infinity, minHeight: 120)
+        .background(
+            RoundedRectangle(cornerRadius: 12)
+                .fill(Color(.systemBackground))
+                .shadow(color: .black.opacity(0.05), radius: 4, x: 0, y: 2)
+        )
+        .buttonStyle(.plain)
     }
 }
 

@@ -11,6 +11,10 @@ struct EntertainmentAppConfig: Codable, Identifiable {
     let pointsCostPer60Min: Int
     let isEnabled: Bool
     let parentConfiguredAt: Date
+
+    enum CodingKeys: String, CodingKey {
+        case bundleID, displayName, pointsCostPer30Min, pointsCostPer60Min, isEnabled, parentConfiguredAt
+    }
     
     func pointsCost(for durationMinutes: Int) -> Int {
         if durationMinutes <= 30 {
@@ -29,6 +33,10 @@ struct AppUnlockInfo: Codable, Identifiable {
     let expiresAt: Date
     let pointsCost: Int
     let childID: String
+
+    enum CodingKeys: String, CodingKey {
+        case bundleID, appName, unlockedAt, expiresAt, pointsCost, childID
+    }
     
     var isActive: Bool {
         Date() < expiresAt
@@ -215,8 +223,11 @@ struct EnhancedRewardsView: View {
         
         // Add to redeemed rewards
         let redemption = RedeemedReward(
+            id: UUID(),
             name: rewardName,
-            cost: cost
+            cost: cost,
+            redeemedAt: Date(),
+            status: .pending
         )
         redeemedRewards.insert(redemption, at: 0)
         

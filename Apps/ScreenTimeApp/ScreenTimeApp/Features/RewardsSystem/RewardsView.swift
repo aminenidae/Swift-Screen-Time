@@ -8,7 +8,7 @@ import SubscriptionService
 struct RewardsView: View {
     @State private var currentPoints: Int = 125
     @State private var entertainmentApps: [FamilyControlsKit.EntertainmentAppConfig] = []
-    @State private var unlockedApps: [AppUnlockInfo] = []
+    @State private var unlockedApps: [FamilyControlsKit.AppUnlockInfo] = []
     @State private var redeemedRewards: [RedeemedReward] = []
     @State private var showingRedemptionAlert = false
     @State private var selectedReward: String = ""
@@ -103,7 +103,7 @@ struct RewardsView: View {
     private func loadEntertainmentApps() {
         // Load saved entertainment app configurations
         let defaults = UserDefaults.standard
-        var apps: [EntertainmentAppConfig] = []
+        var apps: [FamilyControlsKit.EntertainmentAppConfig] = []
 
         // Common entertainment apps with default costs
         let defaultApps = [
@@ -119,11 +119,11 @@ struct RewardsView: View {
 
         for (bundleID, name, cost30, cost60) in defaultApps {
             if let data = defaults.data(forKey: "entertainment_app_\(bundleID)"),
-               let saved = try? JSONDecoder().decode(EntertainmentAppConfig.self, from: data) {
+               let saved = try? JSONDecoder().decode(FamilyControlsKit.EntertainmentAppConfig.self, from: data) {
                 apps.append(saved)
             } else {
                 // Use default configuration
-                let config = EntertainmentAppConfig(
+                let config = FamilyControlsKit.EntertainmentAppConfig(
                     bundleID: bundleID,
                     displayName: name,
                     pointsCostPer30Min: cost30,

@@ -22,7 +22,7 @@ struct ContentView: View {
                     EnhancedChildMainView()
                 } else {
                     AuthenticatedParentView {
-                        EnhancedParentDashboardView()
+                        ParentMainView()
                     }
                 }
             } else {

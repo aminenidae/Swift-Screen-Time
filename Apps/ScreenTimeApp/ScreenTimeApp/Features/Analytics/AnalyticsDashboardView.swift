@@ -107,13 +107,9 @@ struct AnalyticsDashboardView: View {
         isLoading = true
         defer { isLoading = false }
 
-        do {
-            // Generate mock analytics data for now
-            // In a real implementation, this would fetch from AnalyticsService
-            analyticsData = generateMockAnalyticsData()
-        } catch {
-            print("Failed to load analytics data: \(error)")
-        }
+        // Generate mock analytics data for now
+        // In a real implementation, this would fetch from AnalyticsService
+        analyticsData = generateMockAnalyticsData()
     }
 
     private func generateMockAnalyticsData() -> AnalyticsData {
