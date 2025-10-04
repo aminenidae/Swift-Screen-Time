@@ -280,25 +280,25 @@ struct RewardStatisticsSection: View {
                 GridItem(.flexible()),
                 GridItem(.flexible())
             ], spacing: 16) {
-                StatCard(
+                AnalyticsStatCard(
                     title: "Points Balance",
                     value: "\(data.rewardStatistics.totalPointsEarned - data.rewardStatistics.totalPointsSpent)",
                     subtitle: "Available"
                 )
 
-                StatCard(
+                AnalyticsStatCard(
                     title: "Current Streak",
                     value: "\(data.rewardStatistics.streakDays)",
                     subtitle: "Days"
                 )
 
-                StatCard(
+                AnalyticsStatCard(
                     title: "Most Redeemed",
                     value: data.rewardStatistics.mostRedeemed,
                     subtitle: "This month"
                 )
 
-                StatCard(
+                AnalyticsStatCard(
                     title: "Goal Rate",
                     value: "\(Int(data.rewardStatistics.goalAchievementRate * 100))%",
                     subtitle: "Achievement"
@@ -364,7 +364,7 @@ struct MetricCard: View {
     }
 }
 
-struct StatCard: View {
+struct AnalyticsStatCard: View {
     let title: String
     let value: String
     let subtitle: String

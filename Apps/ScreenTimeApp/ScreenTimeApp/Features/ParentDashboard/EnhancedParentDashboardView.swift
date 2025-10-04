@@ -2,6 +2,7 @@ import SwiftUI
 import SharedModels
 import CloudKitService
 import DesignSystem
+import FamilyControlsKit
 
 /// Enhanced dashboard tab showing child progress overview and family statistics
 struct EnhancedParentDashboardView: View {

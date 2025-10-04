@@ -272,7 +272,7 @@ struct QuickActionsSection: View {
                 }
                 .buttonStyle(.plain)
                 
-                NavigationLink(destination: ReportsView()) {
+                NavigationLink(destination: DashboardReportsView()) {
                     EnhancedQuickActionCard(
                         title: "Reports", 
                         icon: "chart.bar.fill", 
@@ -281,7 +281,7 @@ struct QuickActionsSection: View {
                 }
                 .buttonStyle(.plain)
                 
-                NavigationLink(destination: BasicTimeLimitsView()) {
+                NavigationLink(destination: DashboardTimeLimitsView()) {
                     EnhancedQuickActionCard(
                         title: "Time Limits", 
                         icon: "clock.fill", 
@@ -290,7 +290,7 @@ struct QuickActionsSection: View {
                 }
                 .buttonStyle(.plain)
                 
-                NavigationLink(destination: ChildSpecificAppCategoriesView()) {
+                NavigationLink(destination: DashboardAppCategoriesView()) {
                     EnhancedQuickActionCard(
                         title: "App Categories", 
                         icon: "square.grid.2x2.fill", 
@@ -366,19 +366,19 @@ struct EmptyChildrenState: View {
 }
 
 // Mock views for navigation links
-struct ReportsView: View {
+struct DashboardReportsView: View {
     var body: some View {
         Text("Reports View")
     }
 }
 
-struct BasicTimeLimitsView: View {
+struct DashboardTimeLimitsView: View {
     var body: some View {
         Text("Time Limits View")
     }
 }
 
-struct ChildSpecificAppCategoriesView: View {
+struct DashboardAppCategoriesView: View {
     var body: some View {
         Text("App Categories View")
     }
